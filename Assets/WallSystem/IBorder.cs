@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IBorder
+namespace WallSystem.Interfaces
 {
-    public Vector3[] GetBorderPoints();
+    public interface IBorder
+    {
+        public Vector3[] GetBorderPoints();
+    }
 }
