@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
+using WallSystem.Interfaces;
 
 namespace WallSystem
 {
