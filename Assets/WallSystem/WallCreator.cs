@@ -9,16 +9,21 @@ namespace WallSystem
     {
         [SerializeField] private int numberOfPoints;
         [SerializeField] private float radius;
-        [SerializeField] private float wallHeight;
         [SerializeField] private float tolerance;
 
-        private IBorder border;
+        [Header("Wall Settings")]
+        [SerializeField] private float wallHeight;
+        [SerializeField] private Material wallMaterial;
+
+        private VRBorder border;
 
         private FloorPlanCreator floorPlanCreator = new();
 
         private void Start()
         {
             border = new VRBorder();
+            if (border.GetBorderPoints() != null && border.GetBorderPoints().Count != 0)
+                CreateWallWithMeshes(border);
         }
 
         private void OnDrawGizmos()
@@ -26,19 +31,29 @@ namespace WallSystem
             floorPlanCreator.DrawFloorPlanGizmos();
         }
 
-        [ContextMenu("Create Random Wall")]
-        public Wall CreateRandomWallFromBorder(/*IBorder border*/)
+        public Wall CreateRandomWallFromBorder(IBorder border)
         {
             Wall wall = new GameObject("RandomWall").AddComponent<Wall>();
             wall.Init(wallHeight);
 
-            FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(RecalculateCircle(), tolerance);
+            FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(border.GetBorderPoints(), tolerance);
 
             for(int i = 0; i < fp.wallPoints.Count; i++)
             {
                 wall.AddWallSegment(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count]);
             }
             return wall;
+        }
+
+        public void CreateWallWithMeshes(IBorder border)
+        {
+            var wall = CreateRandomWallFromBorder(border);
+
+            foreach(WallSegment wallSegment in wall.GetWallSegments())
+            {
+                wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateMesh(wallSegment);
+                wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
+            }
         }
 
         private List<Vector3> RecalculateCircle()
