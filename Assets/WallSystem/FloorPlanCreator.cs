@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using WallSystem.Interfaces;
 
 namespace WallSystem
 {
-    public class FloorPlanCreator : MonoBehaviour
+    public class FloorPlanCreator
     {
         public int numberOfPoints = 100;
         public float radius = 5f;
@@ -24,7 +25,7 @@ namespace WallSystem
         float x;
         float z;
 
-        Vector3[] simplifiedPointsArray;
+        List<Vector3> simplifiedPointsList;
 
         Vector3 firstPoint;
         Vector3 lastPoint;
@@ -71,35 +72,40 @@ namespace WallSystem
             }
         }
 
-        public Vector3[] SimplifyClosedLoop(Vector3[] points, float tolerance)
+        public FloorPlan CreateFloorPlanFromBorder(IBorder border, float tolerance)
         {
-            simplifiedPointsArray = SimplifyOpenCurve(points, tolerance);
-
-            // Connect the last point to the first point to close the loop
-            firstPoint = simplifiedPointsArray[0];
-            lastPoint = simplifiedPointsArray[simplifiedPointsArray.Length - 1];
-
-            if (Vector2.Distance(firstPoint, lastPoint) > tolerance)
-                simplifiedPointsArray = simplifiedPointsArray.Concat(new[] { firstPoint }).ToArray();
-
-            return simplifiedPointsArray;
+            return new FloorPlan(SimplifyClosedLoop(border.GetBorderPoints(), tolerance));
         }
 
-        private Vector3[] SimplifyOpenCurve(Vector3[] points, float tolerance)
+        private List<Vector3> SimplifyClosedLoop(List<Vector3> points, float tolerance)
         {
-            if (points.Length < 3)
+            simplifiedPointsList = SimplifyOpenCurve(points, tolerance);
+
+            // Connect the last point to the first point to close the loop
+            firstPoint = simplifiedPointsList[0];
+            lastPoint = simplifiedPointsList[simplifiedPointsList.Count - 1];
+
+            if (Vector2.Distance(firstPoint, lastPoint) > tolerance)
+                simplifiedPointsList.Add(firstPoint);
+
+            return simplifiedPointsList;
+        }
+
+        private List<Vector3> SimplifyOpenCurve(List<Vector3> points, float tolerance)
+        {
+            if (points.Count < 3)
                 return points;
 
             List<Vector3> simplifiedPoints = new List<Vector3>();
 
-            SimplifySection(points, 0, points.Length - 1, tolerance, simplifiedPoints);
+            SimplifySection(points, 0, points.Count - 1, tolerance, simplifiedPoints);
 
-            simplifiedPoints.Add(points[points.Length - 1]);
+            simplifiedPoints.Add(points[points.Count - 1]);
 
-            return simplifiedPoints.ToArray();
+            return simplifiedPoints;
         }
 
-        private void SimplifySection(Vector3[] points, int startIndex, int endIndex, float tolerance, List<Vector3> simplifiedPoints)
+        private void SimplifySection(List<Vector3> points, int startIndex, int endIndex, float tolerance, List<Vector3> simplifiedPoints)
         {
             float maxDistance = 0f;
             int maxIndex = 0;
