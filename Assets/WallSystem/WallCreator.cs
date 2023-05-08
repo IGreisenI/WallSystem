@@ -7,6 +7,8 @@ namespace WallSystem
 {
     public class WallCreator : MonoBehaviour
     {
+        [SerializeField] private int numberOfPoints;
+        [SerializeField] private float radius;
         [SerializeField] private float wallHeight;
         [SerializeField] private float tolerance;
 
@@ -25,7 +27,7 @@ namespace WallSystem
         }
 
         [ContextMenu("Create Random Wall")]
-        public void CreateRandomWallFromBorder(/*IBorder border*/)
+        public Wall CreateRandomWallFromBorder(/*IBorder border*/)
         {
             Wall wall = new GameObject("RandomWall").AddComponent<Wall>();
             wall.Init(wallHeight);
@@ -36,18 +38,16 @@ namespace WallSystem
             {
                 wall.AddWallSegment(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count]);
             }
+            return wall;
         }
 
         private List<Vector3> RecalculateCircle()
         {
-            int numberOfPoints = Random.Range(50, 150);
-            float radius = Random.Range(5, 20);
             List<Vector3> positions = new List<Vector3>();
 
             float angleIncrement = 360f / numberOfPoints;
             for (int i = 0; i < numberOfPoints; i++)
             {
-
                 float rand = Random.Range(0.9f, 1.1f);
                 float angle = i * angleIncrement;
                 float x = Vector3.zero.x + radius * rand * Mathf.Cos(Mathf.Deg2Rad * angle);
