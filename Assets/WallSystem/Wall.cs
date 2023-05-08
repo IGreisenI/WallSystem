@@ -7,6 +7,7 @@ namespace WallSystem
     public class Wall : MonoBehaviour
     {
         [SerializeField] private float _wallHeight;
+        [SerializeField] private float _wallDepth;
         [SerializeField] private List<WallSegment> _wallSegments = new();
 
         #region CACHE
