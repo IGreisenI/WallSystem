@@ -22,6 +22,8 @@ namespace WallSystem
 
         public void DrawFloorPlanGizmos()
         {
+            if (floorPlan.wallPoints == null) return;
+
             for(int i = 0; i < floorPlan.wallPoints.Count; i++)
             {
                 Gizmos.color = Color.red;
