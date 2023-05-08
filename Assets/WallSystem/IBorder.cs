@@ -6,6 +6,6 @@ namespace WallSystem.Interfaces
 {
     public interface IBorder
     {
-        public Vector3[] GetBorderPoints();
+        public List<Vector3> GetBorderPoints();
     }
 }
