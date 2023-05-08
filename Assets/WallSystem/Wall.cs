@@ -38,6 +38,16 @@ namespace WallSystem
             _wallSegments.Add(tempWallSegment);
         }
 
+        public void AddWallSegmentWithDepth(Vector3 firstGroundPoint, Vector3 secondGroundPoint, Vector3 firstDepthVector, Vector3 secondDepthVector)
+        {
+
+        }
+
+        public List<WallSegment> GetWallSegments()
+        {
+            return _wallSegments;
+        }
+
         public void SetHeight(float wallHeight)
         {
             _wallHeight = wallHeight;
