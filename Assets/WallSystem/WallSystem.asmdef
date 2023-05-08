@@ -2,7 +2,8 @@
     "name": "WallSystem",
     "rootNamespace": "",
     "references": [
-        "GUID:4847341ff46394e83bb78fbd0652937e"
+        "GUID:4847341ff46394e83bb78fbd0652937e",
+        "GUID:e40ba710768534012815d3193fa296cb"
     ],
     "includePlatforms": [],
     "excludePlatforms": [
