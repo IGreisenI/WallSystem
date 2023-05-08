@@ -1,16 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace WallSystem
 {
-    public class WallSegment
+    public class WallSegment : MonoBehaviour
     {
-        private Vector3 _firstGroundPoint;
-        private Vector3 _secondGroundPoint;
-        private Vector3 _wallSegmentHeightVector;
+        [SerializeField] private Vector3 _firstGroundPoint;
+        [SerializeField] private Vector3 _secondGroundPoint;
+        [SerializeField] private Vector3 _wallSegmentHeightVector;
 
-        public WallSegment(Vector3 firstGroundPoint, Vector3 secondGroundPoint, float wallSegmentHeight)
+        public void Init(Vector3 firstGroundPoint, Vector3 secondGroundPoint, float wallSegmentHeight)
         {
             _firstGroundPoint = firstGroundPoint;
             _secondGroundPoint = secondGroundPoint;
@@ -30,7 +31,6 @@ namespace WallSystem
             Gizmos.DrawLine(_secondGroundPoint, _secondGroundPoint + _wallSegmentHeightVector);
             Gizmos.DrawLine(_secondGroundPoint + _wallSegmentHeightVector, _firstGroundPoint + _wallSegmentHeightVector);
             Gizmos.DrawLine(_firstGroundPoint + _wallSegmentHeightVector, _firstGroundPoint);
-
         }
     }
 }
