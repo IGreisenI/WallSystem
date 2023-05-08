@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace WallSystem
 {
-    public class WallSegement
+    public class WallSegment
     {
         private Vector3 _firstGroundPoint;
         private Vector3 _secondGroundPoint;
         private Vector3 _wallSegmentHeightVector;
 
-        public WallSegement(Vector3 firstGroundPoint, Vector3 secondGroundPoint, float wallSegmentHeight)
+        public WallSegment(Vector3 firstGroundPoint, Vector3 secondGroundPoint, float wallSegmentHeight)
         {
             _firstGroundPoint = firstGroundPoint;
             _secondGroundPoint = secondGroundPoint;
