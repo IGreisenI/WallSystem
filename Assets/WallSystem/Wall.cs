@@ -7,16 +7,17 @@ namespace WallSystem
     public class Wall : MonoBehaviour
     {
         [SerializeField] private float _wallHeight;
-        [SerializeField] private float _wallDepth;
+        [SerializeField] private float _wallWidth;
         [SerializeField] private List<WallSegment> _wallSegments = new();
 
         #region CACHE
         WallSegment tempWallSegment;
         #endregion
 
-        public void Init(float wallHeight)
+        public void Init(float wallHeight, float wallWidth)
         {
             _wallHeight = wallHeight;
+            _wallWidth = wallWidth;
             _wallSegments = new List<WallSegment>();
         }
 
@@ -28,7 +29,7 @@ namespace WallSystem
             }
         }
 
-        public void AddWallSegment(Vector3 firstGroundPoint, Vector3 secondGroundPoint)
+        public void AddFlatWallSegment(Vector3 firstGroundPoint, Vector3 secondGroundPoint)
         {
             tempWallSegment = new GameObject("WallSegment").AddComponent<WallSegment>();
             tempWallSegment.transform.parent = this.transform;
@@ -38,9 +39,13 @@ namespace WallSystem
             _wallSegments.Add(tempWallSegment);
         }
 
-        public void AddWallSegmentWithDepth(Vector3 firstGroundPoint, Vector3 secondGroundPoint, Vector3 firstDepthVector, Vector3 secondDepthVector)
+        public void AddWallSegmentWithDepth(Vector3 firstGroundPoint, Vector3 secondGroundPoint, Vector3 firstDepthNormVector, Vector3 secondDepthNormVector)
         {
+            tempWallSegment = new GameObject("WallSegment").AddComponent<WallSegment>();
+            tempWallSegment.transform.parent = this.transform;
 
+            tempWallSegment.InitWithDepth(firstGroundPoint, secondGroundPoint, firstDepthNormVector.normalized * _wallWidth, secondDepthNormVector * _wallWidth, _wallHeight, _wallWidth);
+            _wallSegments.Add(tempWallSegment);
         }
 
         public List<WallSegment> GetWallSegments()

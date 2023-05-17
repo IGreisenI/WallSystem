@@ -7,23 +7,35 @@ namespace WallSystem
 {
     public class WallCreator : MonoBehaviour
     {
+        [SerializeField] private GameObject RedCircle;
+
         [SerializeField] private int numberOfPoints;
         [SerializeField] private float radius;
         [SerializeField] private float tolerance;
 
         [Header("Wall Settings")]
         [SerializeField] private float wallHeight;
+        [SerializeField] private float wallWidth;
         [SerializeField] private Material wallMaterial;
 
-        private VRBorder border;
-
+        private List<Vector3> borderPoints = new();
+        private IBorder border;
         private FloorPlanCreator floorPlanCreator = new();
 
         private void Start()
         {
             border = new VRBorder();
+
             if (border.GetBorderPoints() != null && border.GetBorderPoints().Count != 0)
-                CreateWallWithMeshes(border);
+            {
+                borderPoints = border.GetBorderPoints();
+            }
+            else
+            {
+                borderPoints = RecalculateCircle();
+            }
+
+            CreateWallWithMeshes(borderPoints);
         }
 
         private void OnDrawGizmos()
@@ -31,29 +43,42 @@ namespace WallSystem
             floorPlanCreator.DrawFloorPlanGizmos();
         }
 
-        public Wall CreateRandomWallFromBorder(IBorder border)
+        private Wall CreateWallFromPoints(List<Vector3> points)
         {
             Wall wall = new GameObject("RandomWall").AddComponent<Wall>();
-            wall.Init(wallHeight);
+            wall.Init(wallHeight, wallWidth);
 
-            FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(border.GetBorderPoints(), tolerance);
+            FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
 
             for(int i = 0; i < fp.wallPoints.Count; i++)
             {
-                wall.AddWallSegment(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count]);
+                //wall.AddFlatWallSegment(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count]);
+                wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
             }
             return wall;
         }
 
-        public void CreateWallWithMeshes(IBorder border)
+        private void CreateWallWithMeshes(List<Vector3> borderPoints)
         {
-            var wall = CreateRandomWallFromBorder(border);
+            Wall wall = CreateWallFromPoints(borderPoints);
 
             foreach(WallSegment wallSegment in wall.GetWallSegments())
             {
-                wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateMesh(wallSegment);
+                wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
                 wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
             }
+        }
+
+        [ContextMenu("CreateRandomWallFromPoints")]
+        private void CreateRandomWallFromPoints()
+        {
+            CreateWallFromPoints(RecalculateCircle());
+        }
+
+        [ContextMenu("CreateRandomWallWithMeshFromPoints")]
+        private void CreateRandomWallWithMeshFromPoints()
+        {
+            CreateWallWithMeshes(RecalculateCircle());
         }
 
         private List<Vector3> RecalculateCircle()

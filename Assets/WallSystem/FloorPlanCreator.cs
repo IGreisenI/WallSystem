@@ -22,17 +22,20 @@ namespace WallSystem
 
         public void DrawFloorPlanGizmos()
         {
-            if (floorPlan.wallPoints == null) return;
+            if (floorPlan?.wallPoints == null) return;
 
-            for(int i = 0; i < floorPlan.wallPoints.Count; i++)
+            for (int i = 0; i < floorPlan.wallPoints.Count; i++)
             {
                 Gizmos.color = Color.red;
                 Gizmos.DrawSphere(floorPlan.wallPoints[i], 0.1f);
 
                 Gizmos.DrawLine(floorPlan.wallPoints[i], floorPlan.wallPoints[(i + 1) % floorPlan.wallPoints.Count]);
+
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(floorPlan.wallPoints[i], floorPlan.wallPoints[i] + floorPlan.wallPointsNormals[i]);
             }
         }
-
+        
         public FloorPlan CreateFloorPlanFromPoints(List<Vector3> points, float tolerance)
         {
             floorPlan = new FloorPlan(SimplifyClosedLoop(points, tolerance));
@@ -43,14 +46,7 @@ namespace WallSystem
         public List<Vector3> SimplifyClosedLoop(List<Vector3> points, float tolerance)
         {
             simplifiedPointsList = SimplifyOpenCurve(points, tolerance);
-
-            // Connect the last point to the first point to close the loop
-            firstPoint = simplifiedPointsList[0];
-            lastPoint = simplifiedPointsList[simplifiedPointsList.Count - 1];
-
-            if (Vector2.Distance(firstPoint, lastPoint) > tolerance)
-                simplifiedPointsList.Add(firstPoint);
-
+            
             return simplifiedPointsList;
         }
 
@@ -60,6 +56,7 @@ namespace WallSystem
                 return points;
 
             List<Vector3> simplifiedPoints = new List<Vector3>();
+            simplifiedPoints.Add(points[0]);
 
             SimplifySection(points, 0, points.Count - 1, tolerance, simplifiedPoints);
 

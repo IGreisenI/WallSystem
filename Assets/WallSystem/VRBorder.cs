@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,6 +42,7 @@ namespace WallSystem
 
         public List<Vector3> GetBorderPoints()
         {
+            InputSubsystem_boundaryChanged(xrInputSubsystem);
             return boundaryPoints;
         }
     }
