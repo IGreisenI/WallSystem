@@ -18,6 +18,7 @@ namespace WallSystem
                 vertices.AddRange(wallSegment.GetAllPoints());
             }
 
+            //Setup Triangles
             #region Triangles
             List<int> triangles = new();
 
@@ -77,45 +78,29 @@ namespace WallSystem
             mesh.vertices = vertices.ToArray();
             mesh.triangles = triangles.ToArray();
 
-            Vector2[] uvs = {
-                // Front face
-                new Vector2(0, 0.66f),
-                new Vector2(0.25f, 0.66f),
-                new Vector2(0.25f, 0.33f),
-                new Vector2(0, 0.33f),
+            Vector2[] uvs = new Vector2[24];
 
-                // Back face
-                new Vector2(0.5f, 0.66f),
-                new Vector2(0.75f, 0.66f),
-                new Vector2(0.75f, 0.33f),
-                new Vector2(0.5f, 0.33f),
+            for (int index = 0; index < triangles.Count; index += 3)
+            {
+                // Get the three vertices bounding this triangle.
+                Vector3 v1 = vertices[triangles[index]];
+                Vector3 v2 = vertices[triangles[index + 1]];
+                Vector3 v3 = vertices[triangles[index + 2]];
 
-                // Top face
-                new Vector2(0.25f, 1f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0.5f, 0.66f),
-                new Vector2(0.25f, 0.66f),
+                // Compute a vector perpendicular to the face.
+                Vector3 normal = Vector3.Cross(v3 - v1, v2 - v1);
 
-                // Down face
-                new Vector2(0.25f, 0.33f),
-                new Vector2(0.5f, 0.33f),
-                new Vector2(0.5f, 0f),
-                new Vector2(0.25f, 0f),
+                // Form a rotation that points the z+ axis in this perpendicular direction.
+                // Multiplying by the inverse will flatten the triangle into an xy plane.
+                Quaternion rotation = Quaternion.Inverse(Quaternion.LookRotation(normal));
 
-                // Right face
-                new Vector2(0.5f, 0.66f),
-                new Vector2(0.75f, 0.66f),
-                new Vector2(0.75f, 0.33f),
-                new Vector2(0.5f, 0.33f),
+                // Assign the uvs, applying a scale factor to control the texture tiling.
+                uvs[triangles[index]] = (Vector2)(rotation * v1) * 1;
+                uvs[triangles[index + 1]] = (Vector2)(rotation * v2) * 1;
+                uvs[triangles[index + 2]] = (Vector2)(rotation * v3) * 1;
+            }
 
-                // Left face
-                new Vector2(0.25f, 0.66f),
-                new Vector2(0.5f, 0.66f),
-                new Vector2(0.5f, 0.33f),
-                new Vector2(0.25f, 0.33f)
-            };
-
-            mesh.uv = uvs;
+            mesh.SetUVs(0, uvs);
 
             mesh.Optimize();
             mesh.RecalculateNormals();
