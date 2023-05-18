@@ -29,6 +29,7 @@ namespace WallSystem
                 Gizmos.color = Color.red;
                 Gizmos.DrawSphere(floorPlan.wallPoints[i], 0.1f);
 
+                //Draws lines and connects the first point and last point
                 Gizmos.DrawLine(floorPlan.wallPoints[i], floorPlan.wallPoints[(i + 1) % floorPlan.wallPoints.Count]);
 
                 Gizmos.color = Color.blue;
@@ -46,7 +47,7 @@ namespace WallSystem
         public List<Vector3> SimplifyClosedLoop(List<Vector3> points, float tolerance)
         {
             simplifiedPointsList = SimplifyOpenCurve(points, tolerance);
-            
+
             return simplifiedPointsList;
         }
 
