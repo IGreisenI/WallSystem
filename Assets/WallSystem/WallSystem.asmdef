@@ -1,0 +1,40 @@
+{
+    "name": "WallSystem",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4847341ff46394e83bb78fbd0652937e",
+        "GUID:e40ba710768534012815d3193fa296cb",
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:4af21795022437d4bb139a86514b9ff9"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor",
+        "EmbeddedLinux",
+        "GameCoreScarlett",
+        "GameCoreXboxOne",
+        "iOS",
+        "LinuxStandalone64",
+        "CloudRendering",
+        "Lumin",
+        "macOSStandalone",
+        "PS4",
+        "PS5",
+        "Stadia",
+        "Switch",
+        "tvOS",
+        "WSA",
+        "WebGL",
+        "WindowsStandalone32",
+        "WindowsStandalone64",
+        "XboxOne"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
