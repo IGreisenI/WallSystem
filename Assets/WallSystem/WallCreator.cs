@@ -52,7 +52,6 @@ namespace WallSystem
 
             for(int i = 0; i < fp.wallPoints.Count; i++)
             {
-                //wall.AddFlatWallSegment(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count]);
                 wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
             }
             return wall;
