@@ -39,16 +39,9 @@ namespace WallSystem
         
         public FloorPlan CreateFloorPlanFromPoints(List<Vector3> points, float tolerance)
         {
-            floorPlan = new FloorPlan(SimplifyClosedLoop(points, tolerance));
+            floorPlan = new FloorPlan(SimplifyOpenCurve(points, tolerance));
 
             return floorPlan;
-        }
-
-        public List<Vector3> SimplifyClosedLoop(List<Vector3> points, float tolerance)
-        {
-            simplifiedPointsList = SimplifyOpenCurve(points, tolerance);
-
-            return simplifiedPointsList;
         }
 
         private List<Vector3> SimplifyOpenCurve(List<Vector3> points, float tolerance)
