@@ -59,7 +59,7 @@ namespace WallSystem
         {
             Gizmos.color = Color.green;
 
-            for(int i = 0; i < _allPoints.Count; i++)
+            for(int i = 0; i < _allPoints?.Count; i++)
             {
                 Gizmos.DrawLine(_allPoints[i], _allPoints[(i + 1) % _allPoints.Count]);
             }
