@@ -14,7 +14,7 @@ namespace DrawingSystem
         [SerializeField] private float newPointDistance;
         [SerializeField] private float lineThickness;
         [SerializeField] private GameObject linePrefab;
-        [SerializeField] private List<List<Vector3>> drawnLines = new();
+        [SerializeField] private List<DrawnLine> drawnLines = new();
 
         private bool drawing = false;
         private Mesh mesh;
@@ -52,29 +52,34 @@ namespace DrawingSystem
 
         private void NewLine()
         {
-            drawnLines.Add(new List<Vector3>());
             currentLine = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
             currentLine.GetComponent<MeshRenderer>().material.color = drawingColor;
+            drawnLines.Add(new DrawnLine(drawingColor));
         }
 
         private void Draw()
         {
             RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            Ray ray = DrawingRaycast();
             if (Physics.Raycast(ray, out hit, 100))
             {
-                if(drawnLines[^1].Count == 0)
+                if(drawnLines[^1].linePoints.Count == 0)
                 {
                     DrawMeshBeginning(hit.point + hit.normal * 0.001f);
-                    drawnLines[^1].Add(hit.point);
+                    drawnLines[^1].linePoints.Add(hit.point);
                 }
 
-                if (Vector3.Distance(drawnLines[^1][^1], hit.point) > newPointDistance)
+                if (Vector3.Distance(drawnLines[^1].linePoints[^1], hit.point) > newPointDistance)
                 {
                     DrawMeshContinuation(hit.point + hit.normal * 0.001f, hit.normal);
-                    drawnLines[^1].Add(hit.point);
+                    drawnLines[^1].linePoints.Add(hit.point);
                 }
             }
+        }
+
+        private Ray DrawingRaycast()
+        {
+            return Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         }
 
         private void DrawMeshBeginning(Vector3 point)
@@ -128,7 +133,7 @@ namespace DrawingSystem
             int vIndex2 = vIndex + 2;
             int vIndex3 = vIndex + 3;
 
-            Vector3 mouseForwardVector = (point - drawnLines[^1][^1]).normalized;
+            Vector3 mouseForwardVector = (point - drawnLines[^1].linePoints[^1]).normalized;
             Vector3 newVertexUp = point + Vector3.Cross(mouseForwardVector, normal2D) * lineThickness;
             Vector3 newVertexDown = point + Vector3.Cross(mouseForwardVector, normal2D * -1f) * lineThickness;
 
@@ -152,6 +157,5 @@ namespace DrawingSystem
             mesh.uv = uv;
             mesh.triangles = triangles;
         }
-
     }
 }
