@@ -2,7 +2,8 @@
     "name": "DrawingSystem",
     "rootNamespace": "",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:3b4d2b155f863db4ebd3ab35b5788910"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

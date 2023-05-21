@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DrawingSystem.Interface;
 
 namespace DrawingSystem
 {
-    public class DrawingPen : MonoBehaviour
+    public class Drawing : MonoBehaviour
     {
         [SerializeField] private InputActionReference draw;
+        [SerializeField] private GameObject pen;
 
         [Header("Drawing")]
         [SerializeField] private Color drawingColor;
@@ -19,6 +21,7 @@ namespace DrawingSystem
         private bool drawing = false;
         private Mesh mesh;
         private GameObject currentLine;
+        public IDrawingRaycaster drawingRaycaster;
 
         private void OnEnable()
         {
@@ -36,6 +39,7 @@ namespace DrawingSystem
 
         private void Start()
         {
+            drawingRaycaster = pen.GetComponent<IDrawingRaycaster>();
         }
 
         private void Update()
@@ -53,6 +57,7 @@ namespace DrawingSystem
         private void NewLine()
         {
             currentLine = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
+            currentLine.transform.parent = transform;
             currentLine.GetComponent<MeshRenderer>().material.color = drawingColor;
             drawnLines.Add(new DrawnLine(drawingColor));
         }
@@ -60,7 +65,7 @@ namespace DrawingSystem
         private void Draw()
         {
             RaycastHit hit;
-            Ray ray = DrawingRaycast();
+            Ray ray = drawingRaycaster.DrawingRaycast();
             if (Physics.Raycast(ray, out hit, 100))
             {
                 if(drawnLines[^1].linePoints.Count == 0)
@@ -75,11 +80,6 @@ namespace DrawingSystem
                     drawnLines[^1].linePoints.Add(hit.point);
                 }
             }
-        }
-
-        private Ray DrawingRaycast()
-        {
-            return Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         }
 
         private void DrawMeshBeginning(Vector3 point)
