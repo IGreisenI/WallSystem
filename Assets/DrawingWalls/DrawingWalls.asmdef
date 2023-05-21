@@ -1,0 +1,17 @@
+{
+    "name": "DrawingWalls",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4dcc76219c62489488de3f52e18d4729",
+        "GUID:3b4d2b155f863db4ebd3ab35b5788910"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
