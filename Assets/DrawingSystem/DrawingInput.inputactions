@@ -6,7 +6,7 @@
             "id": "5cbb627e-bd7a-45a7-9421-659cd220e662",
             "actions": [
                 {
-                    "name": "MouseDown",
+                    "name": "Draw",
                     "type": "Button",
                     "id": "55212969-5c93-4dfe-a4eb-67fefa7ab509",
                     "expectedControlType": "Button",
@@ -23,7 +23,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MouseDown",
+                    "action": "Draw",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

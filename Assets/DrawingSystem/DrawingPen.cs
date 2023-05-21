@@ -5,34 +5,37 @@ using UnityEngine.InputSystem;
 
 namespace DrawingSystem
 {
-    [RequireComponent(typeof(MeshRenderer))]
     public class DrawingPen : MonoBehaviour
     {
-        [SerializeField] private InputActionReference leftMouseDown;
-        [SerializeField] private MeshRenderer meshRenderer;
+        [SerializeField] private InputActionReference draw;
 
-        [SerializeField] private float newPointDistance;
+        [Header("Drawing")]
         [SerializeField] private Color drawingColor;
-        [SerializeField] private List<Vector3> drawnPoints = new();
+        [SerializeField] private float newPointDistance;
+        [SerializeField] private float lineThickness;
+        [SerializeField] private GameObject linePrefab;
+        [SerializeField] private List<List<Vector3>> drawnLines = new();
 
         private bool drawing = false;
         private Mesh mesh;
+        private GameObject currentLine;
 
         private void OnEnable()
         {
-            leftMouseDown.action.performed += ctx => { ToggleDrawing(); };
-            leftMouseDown.action.canceled += ctx => { ToggleDrawing(); };
+            draw.action.started += ctx => { NewLine(); };
+            draw.action.performed += ctx => { ToggleDrawing(); };
+            draw.action.canceled += ctx => { ToggleDrawing(); };
         }
 
         private void OnDisable()
         {
-            leftMouseDown.action.performed -= ctx => { ToggleDrawing(); };
-            leftMouseDown.action.canceled -= ctx => { ToggleDrawing(); };
+            draw.action.started -= ctx => { NewLine(); };
+            draw.action.performed -= ctx => { ToggleDrawing(); };
+            draw.action.canceled -= ctx => { ToggleDrawing(); };
         }
 
         private void Start()
         {
-            meshRenderer.material.color = drawingColor;
         }
 
         private void Update()
@@ -47,22 +50,29 @@ namespace DrawingSystem
             drawing = !drawing;
         }
 
+        private void NewLine()
+        {
+            drawnLines.Add(new List<Vector3>());
+            currentLine = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
+            currentLine.GetComponent<MeshRenderer>().material.color = drawingColor;
+        }
+
         private void Draw()
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out hit, 100))
             {
-                if(drawnPoints.Count == 0)
+                if(drawnLines[^1].Count == 0)
                 {
                     DrawMeshBeginning(hit.point + hit.normal * 0.001f);
-                    drawnPoints.Add(hit.point);
+                    drawnLines[^1].Add(hit.point);
                 }
 
-                if (Vector3.Distance(drawnPoints[^1], hit.point) > newPointDistance)
+                if (Vector3.Distance(drawnLines[^1][^1], hit.point) > newPointDistance)
                 {
                     DrawMeshContinuation(hit.point + hit.normal * 0.001f, hit.normal);
-                    drawnPoints.Add(hit.point);
+                    drawnLines[^1].Add(hit.point);
                 }
             }
         }
@@ -99,7 +109,7 @@ namespace DrawingSystem
             mesh.triangles = triangles;
             mesh.MarkDynamic();
 
-            gameObject.AddComponent<MeshFilter>().mesh = mesh;
+            currentLine.AddComponent<MeshFilter>().mesh = mesh;
         }
 
         private void DrawMeshContinuation(Vector3 point, Vector3 normal2D)
@@ -118,8 +128,7 @@ namespace DrawingSystem
             int vIndex2 = vIndex + 2;
             int vIndex3 = vIndex + 3;
 
-            Vector3 mouseForwardVector = (point - drawnPoints[^1]).normalized;
-            float lineThickness = 0.1f;
+            Vector3 mouseForwardVector = (point - drawnLines[^1][^1]).normalized;
             Vector3 newVertexUp = point + Vector3.Cross(mouseForwardVector, normal2D) * lineThickness;
             Vector3 newVertexDown = point + Vector3.Cross(mouseForwardVector, normal2D * -1f) * lineThickness;
 
