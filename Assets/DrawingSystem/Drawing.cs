@@ -157,5 +157,10 @@ namespace DrawingSystem
             mesh.uv = uv;
             mesh.triangles = triangles;
         }
+
+        public List<DrawnLine> GetLines()
+        {
+            return drawnLines;
+        }
     }
 }
