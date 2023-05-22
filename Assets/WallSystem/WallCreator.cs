@@ -7,8 +7,6 @@ namespace WallSystem
 {
     public class WallCreator : MonoBehaviour
     {
-        [SerializeField] private GameObject RedCircle;
-
         [SerializeField] private int numberOfPoints;
         [SerializeField] private float radius;
         [SerializeField] private float tolerance;
@@ -22,7 +20,7 @@ namespace WallSystem
         private IBorder border;
         private FloorPlanCreator floorPlanCreator = new();
 
-        private void Start()
+        private void TryCreateWall()
         {
             border = new VRBorder();
 
@@ -57,7 +55,7 @@ namespace WallSystem
             return wall;
         }
 
-        private void CreateWallWithMeshes(List<Vector3> borderPoints)
+        public void CreateWallWithMeshes(List<Vector3> borderPoints)
         {
             Wall wall = CreateWallFromPoints(borderPoints);
 
