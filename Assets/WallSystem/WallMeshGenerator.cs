@@ -102,7 +102,7 @@ namespace WallSystem
 
             mesh.SetUVs(0, uvs);
 
-            mesh.Optimize();
+            //mesh.Optimize();
             mesh.RecalculateNormals();
 
             return mesh;

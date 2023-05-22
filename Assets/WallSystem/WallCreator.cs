@@ -48,6 +48,12 @@ namespace WallSystem
 
             FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
 
+            if(!fp.ContainsPoint(fp.wallPoints[0] + Vector3.Cross(fp.wallPoints[1] - fp.wallPoints[0], Vector3.up)))
+            {
+                points.Reverse();
+                fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
+            }
+
             for(int i = 0; i < fp.wallPoints.Count; i++)
             {
                 wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
