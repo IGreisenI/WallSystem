@@ -53,7 +53,7 @@ namespace WallSystem
                     tempBetweenVector = (wallPoints[1] - wallPoints[0]).normalized + (wallPoints[wallPoints.Count - 1] - wallPoints[0]).normalized;
                 }
 
-                if (ContainsPoint(wallPoints[i] + tempBetweenVector.normalized))
+                if (ContainsPoint(wallPoints[i] + tempBetweenVector.normalized * 0.001f))
                 {
                     tempBetweenVector = -tempBetweenVector;
                 }

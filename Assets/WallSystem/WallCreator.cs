@@ -48,7 +48,7 @@ namespace WallSystem
 
             FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
 
-            if(!fp.ContainsPoint(fp.wallPoints[0] + Vector3.Cross(fp.wallPoints[1] - fp.wallPoints[0], Vector3.up)))
+            if(!fp.ContainsPoint(fp.wallPoints[0] + Vector3.Cross(fp.wallPoints[1] - fp.wallPoints[0], Vector3.up) * 0.001f))
             {
                 points.Reverse();
                 fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
