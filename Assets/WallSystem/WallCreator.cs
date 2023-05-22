@@ -47,18 +47,25 @@ namespace WallSystem
             wall.Init(wallHeight, wallWidth);
 
             FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
+            fp = ReversePointsIfWallDrawnFromRightToLeft(points, fp);
 
-            if(!fp.ContainsPoint(fp.wallPoints[0] + Vector3.Cross(fp.wallPoints[1] - fp.wallPoints[0], Vector3.up) * 0.001f))
+            for (int i = 0; i < fp.wallPoints.Count; i++)
+            {
+                wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
+            }
+            return wall;
+        }
+
+        private FloorPlan ReversePointsIfWallDrawnFromRightToLeft(List<Vector3> points, FloorPlan fp)
+        {
+            // Checks if the wall is drawn from right to left because the triangles are in the wrong order and if it is it reverses the list of points
+            if (!fp.ContainsPoint(fp.wallPoints[0] + ((fp.wallPoints[1] - fp.wallPoints[0]) / 2 + Vector3.Cross(fp.wallPoints[1] - fp.wallPoints[0], Vector3.up) * 0.01f)))
             {
                 points.Reverse();
                 fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
             }
 
-            for(int i = 0; i < fp.wallPoints.Count; i++)
-            {
-                wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
-            }
-            return wall;
+            return fp;
         }
 
         public void CreateWallWithMeshes(List<Vector3> borderPoints)
