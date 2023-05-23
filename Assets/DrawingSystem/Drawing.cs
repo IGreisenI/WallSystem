@@ -9,7 +9,8 @@ namespace DrawingSystem
     public class Drawing : MonoBehaviour
     {
         [SerializeField] private InputActionReference draw;
-        [SerializeField] private GameObject pen;
+        [Tooltip("Raycaster objectis should inherit IDrawingRaycaster")]
+        [SerializeField] private GameObject raycasterObject;
 
         [Header("Drawing")]
         [SerializeField] private Color drawingColor;
@@ -37,9 +38,10 @@ namespace DrawingSystem
             draw.action.canceled -= ctx => { ToggleDrawing(); };
         }
 
-        private void Start()
+        private void Awake()
         {
-            drawingRaycaster = pen.GetComponent<IDrawingRaycaster>();
+            drawingRaycaster = raycasterObject.GetComponent<IDrawingRaycaster>();
+            if (drawingRaycaster == null) Debug.LogError("raycasterObject doesn't inherit from IDrawingRaycaster");
         }
 
         private void Update()
