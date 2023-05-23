@@ -7,8 +7,6 @@ namespace WallSystem
 {
     public class WallCreator : MonoBehaviour
     {
-        [SerializeField] private GameObject RedCircle;
-
         [SerializeField] private int numberOfPoints;
         [SerializeField] private float radius;
         [SerializeField] private float tolerance;
@@ -22,7 +20,7 @@ namespace WallSystem
         private IBorder border;
         private FloorPlanCreator floorPlanCreator = new();
 
-        private void Start()
+        private void TryCreateWall()
         {
             border = new VRBorder();
 
@@ -50,22 +48,25 @@ namespace WallSystem
 
             FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
 
-            for(int i = 0; i < fp.wallPoints.Count; i++)
+            for (int i = 0; i < fp.wallPoints.Count; i++)
             {
                 wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
             }
             return wall;
         }
 
-        private void CreateWallWithMeshes(List<Vector3> borderPoints)
+        public Wall CreateWallWithMeshes(List<Vector3> borderPoints, bool closed = false)
         {
             Wall wall = CreateWallFromPoints(borderPoints);
+            if(!closed) wall.ModifyIntoOpenWall();
 
             foreach(WallSegment wallSegment in wall.GetWallSegments())
             {
                 wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
                 wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
             }
+
+            return wall;
         }
 
         [ContextMenu("CreateRandomWallFromPoints")]

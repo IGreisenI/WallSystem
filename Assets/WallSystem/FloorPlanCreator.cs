@@ -12,14 +12,6 @@ namespace WallSystem
     {
         [SerializeField] FloorPlan floorPlan;
 
-        #region CACHE
-
-        List<Vector3> simplifiedPointsList;
-
-        Vector3 firstPoint;
-        Vector3 lastPoint;
-        #endregion
-
         public void DrawFloorPlanGizmos()
         {
             if (floorPlan?.wallPoints == null) return;

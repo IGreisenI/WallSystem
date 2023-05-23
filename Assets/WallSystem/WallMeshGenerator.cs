@@ -57,19 +57,19 @@ namespace WallSystem
 
             // Right face
             triangles.Add(17);
-            triangles.Add(18);
+            triangles.Add(21);
             triangles.Add(22);
             triangles.Add(17);
             triangles.Add(22);
-            triangles.Add(21);
+            triangles.Add(18);
 
             // Left face
             triangles.Add(20);
-            triangles.Add(23);
+            triangles.Add(16);
             triangles.Add(19);
             triangles.Add(20);
             triangles.Add(19);
-            triangles.Add(16);
+            triangles.Add(23);
 
             #endregion
 

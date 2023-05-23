@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using DrawingSystem.Interface;
+using System;
 
 namespace DrawingSystem
 {
     public class Drawing : MonoBehaviour
     {
+        public Action<DrawnLine> OnFinishedLastLine;
+
         [SerializeField] private InputActionReference draw;
-        [SerializeField] private GameObject pen;
+        [Tooltip("Raycaster objectis should inherit IDrawingRaycaster")]
+        [SerializeField] private GameObject raycasterObject;
 
         [Header("Drawing")]
         [SerializeField] private Color drawingColor;
@@ -21,13 +25,14 @@ namespace DrawingSystem
         private bool drawing = false;
         private Mesh mesh;
         private GameObject currentLine;
-        public IDrawingRaycaster drawingRaycaster;
+        private IDrawingRaycaster drawingRaycaster;
 
         private void OnEnable()
         {
             draw.action.started += ctx => { NewLine(); };
             draw.action.performed += ctx => { ToggleDrawing(); };
             draw.action.canceled += ctx => { ToggleDrawing(); };
+            draw.action.canceled += ctx => { OnFinishedLastLine.Invoke(drawnLines[^1]); };
         }
 
         private void OnDisable()
@@ -35,11 +40,13 @@ namespace DrawingSystem
             draw.action.started -= ctx => { NewLine(); };
             draw.action.performed -= ctx => { ToggleDrawing(); };
             draw.action.canceled -= ctx => { ToggleDrawing(); };
+            draw.action.canceled -= ctx => { OnFinishedLastLine.Invoke(drawnLines[^1]); };
         }
 
-        private void Start()
+        private void Awake()
         {
-            drawingRaycaster = pen.GetComponent<IDrawingRaycaster>();
+            drawingRaycaster = raycasterObject.GetComponent<IDrawingRaycaster>();
+            if (drawingRaycaster == null) Debug.LogError("raycasterObject doesn't inherit from IDrawingRaycaster");
         }
 
         private void Update()
@@ -59,7 +66,7 @@ namespace DrawingSystem
             currentLine = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
             currentLine.transform.parent = transform;
             currentLine.GetComponent<MeshRenderer>().material.color = drawingColor;
-            drawnLines.Add(new DrawnLine(drawingColor));
+            drawnLines.Add(new DrawnLine(drawingColor, currentLine));
         }
 
         private void Draw()
@@ -156,6 +163,21 @@ namespace DrawingSystem
             mesh.vertices = vertices;
             mesh.uv = uv;
             mesh.triangles = triangles;
+        }
+
+        public List<DrawnLine> GetLines()
+        {
+            return drawnLines;
+        }
+
+        public void ClearLines()
+        {
+            foreach(DrawnLine line in drawnLines)
+            {
+                Destroy(line.line);
+            }
+
+            drawnLines.Clear();
         }
     }
 }
