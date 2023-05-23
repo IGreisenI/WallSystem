@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33c676246396ea94395fd6f2f1d41a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  closedWall: 0
   drawing: {fileID: 5321998324213312983}
   wallCreator: {fileID: 1976557080}
 --- !u!1 &1181738991
@@ -310,7 +311,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1199279852}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 7.53, z: 0}
+  m_LocalPosition: {x: 0, y: 9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
