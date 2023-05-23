@@ -9,12 +9,21 @@ public class WallFromLines : MonoBehaviour
     [SerializeField] Drawing drawing;
     [SerializeField] WallCreator wallCreator;
 
-    [ContextMenu("CreateWalls")]
-    public void CreateWalls()
+    [ContextMenu("Create Open Walls")]
+    public void CreateOpenWalls()
     {
         foreach(DrawnLine line in drawing.GetLines())
         {
-            wallCreator.CreateWallWithMeshes(line.linePoints);
+            wallCreator.CreateWallWithMeshes(line.linePoints, false);
+        }
+    }
+
+    [ContextMenu("Create Closed Walls")]
+    public void CreateClosedWalls()
+    {
+        foreach (DrawnLine line in drawing.GetLines())
+        {
+            wallCreator.CreateWallWithMeshes(line.linePoints, true);
         }
     }
 }

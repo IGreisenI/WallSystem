@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 900470290}
   - component: {fileID: 900470291}
   m_Layer: 0
-  m_Name: THECREATOR
+  m_Name: Wall from line creator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -729,6 +729,11 @@ PrefabInstance:
     - target: {fileID: 5321998323076075930, guid: bb22866cd3751cc4db37e05761b1caf2,
         type: 3}
       propertyPath: pen
+      value: 
+      objectReference: {fileID: 1317476644}
+    - target: {fileID: 5321998323076075930, guid: bb22866cd3751cc4db37e05761b1caf2,
+        type: 3}
+      propertyPath: raycasterObject
       value: 
       objectReference: {fileID: 1317476644}
     - target: {fileID: 5321998323076075933, guid: bb22866cd3751cc4db37e05761b1caf2,
