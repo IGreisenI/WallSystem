@@ -3,27 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using DrawingSystem;
 using WallSystem;
+using NaughtyAttributes;
 
 public class WallFromLines : MonoBehaviour
 {
-    [SerializeField] Drawing drawing;
-    [SerializeField] WallCreator wallCreator;
+    [SerializeField] private bool closedWall;
 
-    [ContextMenu("Create Open Walls")]
-    public void CreateOpenWalls()
+    [SerializeField] private Drawing drawing;
+    [SerializeField] private WallCreator wallCreator;
+
+    private List<Wall> walls = new();
+
+    private void OnEnable()
     {
-        foreach(DrawnLine line in drawing.GetLines())
-        {
-            wallCreator.CreateWallWithMeshes(line.linePoints, false);
-        }
+        drawing.OnFinishedLastLine += CreateWall;
     }
 
-    [ContextMenu("Create Closed Walls")]
-    public void CreateClosedWalls()
+    private void OnDisable()
     {
-        foreach (DrawnLine line in drawing.GetLines())
-        {
-            wallCreator.CreateWallWithMeshes(line.linePoints, true);
-        }
+        drawing.OnFinishedLastLine -= CreateWall;
+    }
+
+    public void CreateWall(DrawnLine line)
+    {
+        walls.Add(wallCreator.CreateWallWithMeshes(line.linePoints, closedWall));
+    }
+
+    [Button]
+    public void Clear()
+    {
+        walls.ForEach(wall => Destroy(wall.gameObject));
+        walls.Clear();
+        drawing.ClearLines();
     }
 }

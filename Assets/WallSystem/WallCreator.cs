@@ -55,7 +55,7 @@ namespace WallSystem
             return wall;
         }
 
-        public void CreateWallWithMeshes(List<Vector3> borderPoints, bool closed = false)
+        public Wall CreateWallWithMeshes(List<Vector3> borderPoints, bool closed = false)
         {
             Wall wall = CreateWallFromPoints(borderPoints);
             if(!closed) wall.ModifyIntoOpenWall();
@@ -65,6 +65,8 @@ namespace WallSystem
                 wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
                 wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
             }
+
+            return wall;
         }
 
         [ContextMenu("CreateRandomWallFromPoints")]
