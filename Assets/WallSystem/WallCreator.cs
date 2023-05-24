@@ -16,25 +16,8 @@ namespace WallSystem
         [SerializeField] private float wallWidth;
         [SerializeField] private Material wallMaterial;
 
-        private List<Vector3> borderPoints = new();
         private IBorder border;
         private FloorPlanCreator floorPlanCreator = new();
-
-        private void TryCreateWall()
-        {
-            border = new VRBorder();
-
-            if (border.GetBorderPoints() != null && border.GetBorderPoints().Count != 0)
-            {
-                borderPoints = border.GetBorderPoints();
-            }
-            else
-            {
-                borderPoints = RecalculateCircle();
-            }
-
-            CreateWallWithMeshes(borderPoints);
-        }
 
         private void OnDrawGizmos()
         {

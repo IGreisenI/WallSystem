@@ -1,42 +1,48 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using WallSystem.Interfaces;
 using UnityEngine.InputSystem;
-using System;
+using DrawingSystem;
+using DrawingSystem.Interface;
+using WallSystem;
 
-namespace WallSystem
+namespace DrawingWalls
 {
-    public class VRBoundaryCreator : MonoBehaviour, IBorder
+    public class VRBoundaryCreator : MonoBehaviour, IDrawingRaycaster
     {
-        public Action OnFinishedCreatingBoundary;
+        [SerializeField] private GameObject pointMarker;
 
         [SerializeField] private Camera VRCamera;
+        [SerializeField] private InputActionReference startCreatingAction;
         [SerializeField] private InputActionReference confirmPointAction;
-        [SerializeField] private InputActionReference endSettingAction;
+        [SerializeField] private InputActionReference endCreatingAction;
 
-        private List<Vector3> _boundaryPoints = new();
+        [SerializeField] private Drawing drawing;
+        [SerializeField] private WallCreator wallCreator;
 
         private void OnEnable()
         {
+            startCreatingAction.action.performed += ctx => { drawing.NewLine(); };
             confirmPointAction.action.performed += ctx => { SetNextBoundaryPoint(); };
-            endSettingAction.action.performed += ctx => { OnFinishedCreatingBoundary.Invoke(); };
+            endCreatingAction.action.performed += ctx => { wallCreator.CreateWallWithMeshes(drawing.GetLines()[^1].linePoints, true); };
         }
 
         private void OnDisable()
         {
             confirmPointAction.action.performed -= ctx => { SetNextBoundaryPoint(); };
-            endSettingAction.action.performed -= ctx => { OnFinishedCreatingBoundary.Invoke(); };
+            endCreatingAction.action.performed -= ctx => { wallCreator.CreateWallWithMeshes(drawing.GetLines()[^1].linePoints, true); };
         }
 
         public void SetNextBoundaryPoint()
         {
-            _boundaryPoints.Add(new Vector3(VRCamera.transform.position.x, 0f, VRCamera.transform.position.z));
+            drawing.DrawNextPoint();
         }
 
-        public List<Vector3> GetBorderPoints()
+        public Ray DrawingRaycast()
         {
-            return _boundaryPoints;
+            return new Ray(VRCamera.transform.position, Vector3.down);
         }
     }
 }

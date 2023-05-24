@@ -53,7 +53,7 @@ namespace DrawingSystem
         {
             if (!drawing) return;
 
-            Draw();
+            DrawNextPoint();
         }
 
         private void ToggleDrawing()
@@ -61,7 +61,7 @@ namespace DrawingSystem
             drawing = !drawing;
         }
 
-        private void NewLine()
+        public void NewLine()
         {
             currentLine = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
             currentLine.transform.parent = transform;
@@ -69,7 +69,7 @@ namespace DrawingSystem
             drawnLines.Add(new DrawnLine(drawingColor, currentLine));
         }
 
-        private void Draw()
+        public void DrawNextPoint()
         {
             RaycastHit hit;
             Ray ray = drawingRaycaster.DrawingRaycast();
@@ -178,6 +178,11 @@ namespace DrawingSystem
             }
 
             drawnLines.Clear();
+        }
+
+        public void SetDrawingRaycaster(IDrawingRaycaster raycaster)
+        {
+            drawingRaycaster = raycaster;
         }
     }
 }

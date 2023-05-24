@@ -5,35 +5,38 @@ using DrawingSystem;
 using WallSystem;
 using NaughtyAttributes;
 
-public class WallFromLines : MonoBehaviour
+namespace DrawingWalls 
 {
-    [SerializeField] private bool closedWall;
-
-    [SerializeField] private Drawing drawing;
-    [SerializeField] private WallCreator wallCreator;
-
-    private List<Wall> walls = new();
-
-    private void OnEnable()
+    public class WallFromLines : MonoBehaviour
     {
-        drawing.OnFinishedLastLine += CreateWall;
-    }
+        [SerializeField] private bool closedWall;
 
-    private void OnDisable()
-    {
-        drawing.OnFinishedLastLine -= CreateWall;
-    }
+        [SerializeField] private Drawing drawing;
+        [SerializeField] private WallCreator wallCreator;
 
-    public void CreateWall(DrawnLine line)
-    {
-        walls.Add(wallCreator.CreateWallWithMeshes(line.linePoints, closedWall));
-    }
+        private List<Wall> walls = new();
 
-    [Button]
-    public void Clear()
-    {
-        walls.ForEach(wall => Destroy(wall.gameObject));
-        walls.Clear();
-        drawing.ClearLines();
+        private void OnEnable()
+        {
+            drawing.OnFinishedLastLine += CreateWall;
+        }
+
+        private void OnDisable()
+        {
+            drawing.OnFinishedLastLine -= CreateWall;
+        }
+
+        public void CreateWall(DrawnLine line)
+        {
+            walls.Add(wallCreator.CreateWallWithMeshes(line.linePoints, closedWall));
+        }
+
+        [Button]
+        public void Clear()
+        {
+            walls.ForEach(wall => Destroy(wall.gameObject));
+            walls.Clear();
+            drawing.ClearLines();
+        }
     }
 }
