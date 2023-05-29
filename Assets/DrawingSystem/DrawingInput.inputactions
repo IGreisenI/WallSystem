@@ -56,6 +56,17 @@
                 },
                 {
                     "name": "",
+                    "id": "17b7b1ff-e916-41c7-8ccb-22eec267f255",
+                    "path": "<OculusTouchController>{RightHand}/triggerPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Draw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "38691dde-cb31-4122-a11d-d316948f8463",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
@@ -84,6 +95,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "DeleteLine",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eae18286-4274-4c73-b4cb-7d2d0fa4714a",
+                    "path": "<OculusTouchController>/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StartDrawing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9f9cddc5-d23c-4bb3-bb3f-07a2e66fa331",
+                    "path": "<OculusTouchController>{RightHand}/gripPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EndDrawing",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
