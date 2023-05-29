@@ -11,37 +11,45 @@ namespace DrawingSystem
     {
         public Action<DrawnLine> OnFinishedLastLine;
 
+        [SerializeField] private InputActionReference startDrawing;
         [SerializeField] private InputActionReference draw;
+        [SerializeField] private InputActionReference endDrawing;
+        [SerializeField] private InputActionReference deleteLine;
         [Tooltip("Raycaster objectis should inherit IDrawingRaycaster")]
         [SerializeField] private GameObject raycasterObject;
 
         [Header("Drawing")]
         [SerializeField] private Color drawingColor;
         [SerializeField] private float newPointDistance;
+        [SerializeField] private float continueDrawningDistance;
         [SerializeField] private float lineThickness;
         [SerializeField] private GameObject linePrefab;
         [SerializeField] private List<DrawnLine> drawnLines = new();
 
-        private bool drawing = false;
+        private bool isDrawing = false;
         private Mesh mesh;
-        private GameObject currentLine;
+        private GameObject currentLineGameObject;
+        private DrawnLine currentLine;
         private IDrawingRaycaster drawingRaycaster;
 
         private void OnEnable()
         {
-            draw.action.started += ctx => { NewLine(); };
+            startDrawing.action.started += ctx => { StartDrawingLine(); };
             draw.action.performed += ctx => { ToggleDrawing(); };
-            draw.action.canceled += ctx => { ToggleDrawing(); };
-            draw.action.canceled += ctx => { OnFinishedLastLine.Invoke(drawnLines[^1]); };
+            endDrawing.action.canceled += ctx => { ToggleDrawing(); };
+            endDrawing.action.canceled += ctx => { FinishLine(); };
+            deleteLine.action.performed += ctx => { TryDeleteLine(); };
         }
 
         private void OnDisable()
         {
-            draw.action.started -= ctx => { NewLine(); };
+            startDrawing.action.started -= ctx => { StartDrawingLine(); };
             draw.action.performed -= ctx => { ToggleDrawing(); };
-            draw.action.canceled -= ctx => { ToggleDrawing(); };
-            draw.action.canceled -= ctx => { OnFinishedLastLine.Invoke(drawnLines[^1]); };
+            endDrawing.action.canceled -= ctx => { ToggleDrawing(); };
+            endDrawing.action.canceled -= ctx => { FinishLine(); };
+            deleteLine.action.performed -= ctx => { TryDeleteLine(); };
         }
+
 
         private void Awake()
         {
@@ -51,42 +59,96 @@ namespace DrawingSystem
 
         private void Update()
         {
-            if (!drawing) return;
+            if (!isDrawing) return;
 
-            Draw();
+            if (draw.action.phase == InputActionPhase.Performed)
+            {
+                DrawNextPoint();
+            }
         }
 
         private void ToggleDrawing()
         {
-            drawing = !drawing;
+            isDrawing = !isDrawing;
+        }
+
+        public void StartDrawingLine()
+        {
+            RaycastHit hit = RaycastUsingDrawingRaycaster(); 
+
+            for(int i = 0; i < drawnLines.Count; i++)
+            {
+                if(Vector3.Distance(drawnLines[i].linePoints[^1], hit.point) < continueDrawningDistance)
+                {
+                    ContinueLine(i);
+                    return;
+                }
+            }
+
+            NewLine();
         }
 
         private void NewLine()
         {
-            currentLine = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
-            currentLine.transform.parent = transform;
-            currentLine.GetComponent<MeshRenderer>().material.color = drawingColor;
-            drawnLines.Add(new DrawnLine(drawingColor, currentLine));
+            currentLineGameObject = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
+            currentLineGameObject.transform.parent = transform;
+            currentLineGameObject.GetComponent<MeshRenderer>().material.color = drawingColor;
+            currentLine = new DrawnLine(drawingColor, currentLineGameObject);
+            drawnLines.Add(currentLine);
         }
 
-        private void Draw()
+        private void ContinueLine(int drawnLinesIndex)
+        {
+            currentLine = drawnLines[drawnLinesIndex];
+            mesh = currentLine.lineGameObject.GetComponent<MeshFilter>().mesh;
+        }
+
+        private void FinishLine()
+        {
+            currentLine.lineGameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+
+            OnFinishedLastLine?.Invoke(drawnLines[^1]);
+        }
+
+        private void TryDeleteLine()
+        {
+            RaycastHit hit = RaycastUsingDrawingRaycaster();
+
+            foreach (DrawnLine line in drawnLines)
+            {
+                if (line.lineGameObject == hit.collider.gameObject)
+                {
+                    Destroy(line.lineGameObject);
+                    drawnLines.Remove(line);
+                    return;
+                }
+            }
+        }
+
+        public void DrawNextPoint()
+        {
+            RaycastHit hit = RaycastUsingDrawingRaycaster();
+            if (hit.collider == null) return;
+
+            if (currentLine.linePoints.Count == 0)
+            {
+                DrawMeshBeginning(hit.point + hit.normal * 0.001f);
+                currentLine.linePoints.Add(hit.point);
+            }
+
+            if (Vector3.Distance(currentLine.linePoints[^1], hit.point) > newPointDistance)
+            {
+                DrawMeshContinuation(hit.point + hit.normal * 0.001f, hit.normal);
+                currentLine.linePoints.Add(hit.point);
+            }
+        }
+
+        public RaycastHit RaycastUsingDrawingRaycaster()
         {
             RaycastHit hit;
             Ray ray = drawingRaycaster.DrawingRaycast();
-            if (Physics.Raycast(ray, out hit, 100))
-            {
-                if(drawnLines[^1].linePoints.Count == 0)
-                {
-                    DrawMeshBeginning(hit.point + hit.normal * 0.001f);
-                    drawnLines[^1].linePoints.Add(hit.point);
-                }
-
-                if (Vector3.Distance(drawnLines[^1].linePoints[^1], hit.point) > newPointDistance)
-                {
-                    DrawMeshContinuation(hit.point + hit.normal * 0.001f, hit.normal);
-                    drawnLines[^1].linePoints.Add(hit.point);
-                }
-            }
+            Physics.Raycast(ray, out hit, 100);
+            return hit;
         }
 
         private void DrawMeshBeginning(Vector3 point)
@@ -121,7 +183,7 @@ namespace DrawingSystem
             mesh.triangles = triangles;
             mesh.MarkDynamic();
 
-            currentLine.AddComponent<MeshFilter>().mesh = mesh;
+            currentLine.lineGameObject.AddComponent<MeshFilter>().mesh = mesh;
         }
 
         private void DrawMeshContinuation(Vector3 point, Vector3 normal2D)
@@ -140,7 +202,7 @@ namespace DrawingSystem
             int vIndex2 = vIndex + 2;
             int vIndex3 = vIndex + 3;
 
-            Vector3 mouseForwardVector = (point - drawnLines[^1].linePoints[^1]).normalized;
+            Vector3 mouseForwardVector = (point - currentLine.linePoints[^1]).normalized;
             Vector3 newVertexUp = point + Vector3.Cross(mouseForwardVector, normal2D) * lineThickness;
             Vector3 newVertexDown = point + Vector3.Cross(mouseForwardVector, normal2D * -1f) * lineThickness;
 
@@ -170,14 +232,29 @@ namespace DrawingSystem
             return drawnLines;
         }
 
+        public bool IsDrawing()
+        {
+            return isDrawing;
+        }
+
+        public float GetContinueDistanceThreshold()
+        {
+            return continueDrawningDistance;
+        }
+
         public void ClearLines()
         {
             foreach(DrawnLine line in drawnLines)
             {
-                Destroy(line.line);
+                Destroy(line.lineGameObject);
             }
 
             drawnLines.Clear();
+        }
+
+        public void SetDrawingRaycaster(IDrawingRaycaster raycaster)
+        {
+            drawingRaycaster = raycaster;
         }
     }
 }

@@ -1,0 +1,74 @@
+{
+    "name": "VrBoundaryCreator",
+    "maps": [
+        {
+            "name": "VrBoundaryCreator",
+            "id": "89043937-0ce8-45b8-9a8b-77017ca448fb",
+            "actions": [
+                {
+                    "name": "ConfirmPoint",
+                    "type": "Button",
+                    "id": "ae71ce9a-4759-45f2-ba87-33858bfaa625",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EndCreatingBoundary",
+                    "type": "Button",
+                    "id": "e0ca4f49-033b-4e42-8cf9-1c09dcf2d246",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "StartCreatingBoundary",
+                    "type": "Button",
+                    "id": "731f588e-261b-4790-83ed-d3520f50dc88",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "336ab9f0-3f2f-452d-9a93-0aa7c5796f9d",
+                    "path": "<OculusTouchController>{RightHand}/triggerPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ConfirmPoint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "52c22857-a9a5-417e-9fd2-10c78cb6cc34",
+                    "path": "<OculusTouchController>{RightHand}/gripPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EndCreatingBoundary",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "73cdb21e-f371-44ba-b26b-2ec00dac7e01",
+                    "path": "<OculusTouchController>/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StartCreatingBoundary",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
