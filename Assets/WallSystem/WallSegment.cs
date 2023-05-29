@@ -64,5 +64,17 @@ namespace WallSystem
                 Gizmos.DrawLine(_allPoints[i], _allPoints[(i + 1) % _allPoints.Count]);
             }
         }
+
+        public void SetFirstDepthVector(Vector3 depthVector)
+        {
+            _firstDepthVector = depthVector;
+            CalculateAllPoints();
+        }
+
+        public void SetSecondDepthVector(Vector3 depthVector)
+        {
+            _secondDepthVector = depthVector;
+            CalculateAllPoints();
+        }
     }
 }

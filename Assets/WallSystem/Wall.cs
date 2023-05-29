@@ -23,7 +23,7 @@ namespace WallSystem
 
         private void OnDrawGizmos()
         {
-            foreach(WallSegment wallSegment in _wallSegments)
+            foreach (WallSegment wallSegment in _wallSegments)
             {
                 wallSegment.DrawWallGizmos();
             }
@@ -56,6 +56,19 @@ namespace WallSystem
         public void SetHeight(float wallHeight)
         {
             _wallHeight = wallHeight;
+        }
+
+        public void ModifyIntoOpenWall()
+        {
+            _wallSegments.Remove(_wallSegments[^1]);
+            List<Vector3> firstWallSegmentPoints = _wallSegments[0].GetAllPoints();
+            List<Vector3> lastWallSegmentPoints = _wallSegments[^1].GetAllPoints();
+
+            Vector3 firstDepthVector = - Vector3.Cross(firstWallSegmentPoints[1] - firstWallSegmentPoints[0], Vector3.up).normalized;
+            Vector3 lastDepthVector = Vector3.Cross(lastWallSegmentPoints[0] - lastWallSegmentPoints[1], Vector3.up).normalized;
+
+            _wallSegments[0].SetFirstDepthVector(firstDepthVector * _wallWidth);
+            _wallSegments[^1].SetSecondDepthVector(lastDepthVector * _wallWidth);
         }
     }
 }

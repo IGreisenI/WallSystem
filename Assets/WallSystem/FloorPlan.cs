@@ -15,6 +15,7 @@ namespace WallSystem
         public FloorPlan(List<Vector3> borderPoints)
         {
             this.wallPoints = borderPoints;
+            ReversePointsIfFloorPlanDrawnFromRightToLeft();
             SetWallPointsNormals();
         }
 
@@ -53,12 +54,23 @@ namespace WallSystem
                     tempBetweenVector = (wallPoints[1] - wallPoints[0]).normalized + (wallPoints[wallPoints.Count - 1] - wallPoints[0]).normalized;
                 }
 
-                if (ContainsPoint(wallPoints[i] + tempBetweenVector.normalized))
+                if (ContainsPoint(wallPoints[i] + tempBetweenVector.normalized * 0.001f))
                 {
                     tempBetweenVector = -tempBetweenVector;
                 }
 
                 wallPointsNormals.Add(tempBetweenVector.normalized);
+            }
+        }
+
+        /// <summary>
+        /// Checks if the wall is drawn from right to left because the triangles are in the wrong order and if it is it reverses the list of points
+        /// </summary>
+        private void ReversePointsIfFloorPlanDrawnFromRightToLeft()
+        {
+            if (!ContainsPoint(wallPoints[0] + ((wallPoints[1] - wallPoints[0]) / 2 + Vector3.Cross(wallPoints[1] - wallPoints[0], Vector3.up) * 0.01f)))
+            {
+                wallPoints.Reverse();
             }
         }
     }
