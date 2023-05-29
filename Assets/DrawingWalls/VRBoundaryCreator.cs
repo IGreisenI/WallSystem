@@ -24,7 +24,7 @@ namespace DrawingWalls
 
         private void OnEnable()
         {
-            startCreatingAction.action.performed += ctx => { drawing.NewLine(); };
+            startCreatingAction.action.performed += ctx => { drawing.StartDrawingLine(); };
             confirmPointAction.action.performed += ctx => { SetNextBoundaryPoint(); };
             endCreatingAction.action.performed += ctx => { wallCreator.CreateWallWithMeshes(drawing.GetLines()[^1].linePoints, true); };
         }

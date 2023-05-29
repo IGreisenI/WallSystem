@@ -6,7 +6,7 @@ namespace DrawingSystem
 {
     public struct DrawnLine
     {
-        public GameObject line;
+        public GameObject lineGameObject;
         public List<Vector3> linePoints;
         public Color lineColor;
 
@@ -14,7 +14,7 @@ namespace DrawingSystem
         {
             this.linePoints = new();
             this.lineColor = lineColor;
-            this.line = line;
+            this.lineGameObject = line;
         }
     }
 }
