@@ -1,7 +1,9 @@
 {
     "name": "WallSystem.Editor",
     "rootNamespace": "WallSystem.Editor",
-    "references": [],
+    "references": [
+        "GUID:7244dde6f3c2c034dbdeed988bd99d08"
+    ],
     "includePlatforms": [
         "Editor"
     ],

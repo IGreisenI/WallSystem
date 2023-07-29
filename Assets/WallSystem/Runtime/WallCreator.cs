@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using WallSystem.Runtime.Interfaces;
+using NaughtyAttributes;
 
 namespace WallSystem.Runtime
 {
@@ -17,19 +18,15 @@ namespace WallSystem.Runtime
         [SerializeField] private float wallWidth;
         [SerializeField] private Material wallMaterial;
 
-        [Header("Top of Wall Settings")]
+        [Header("Dynamic Geometry Settings")]
+        [SerializeField] private GameObject dynamicGeometry;
+        [SerializeField] private Vector3 geometryLookRotation;
         [SerializeField] private bool spreadGeometry;
-        [SerializeField] private Vector3 topLookRotation;
-        [SerializeField] private GameObject topOfWallG;
-
-        [Header("Side of Wall Settings")]
-        [SerializeField] private bool spreadGeometrySide;
-        [SerializeField] private Vector3 frontSideLookRotation;
-        [SerializeField] private Vector3 backSideLookRotation;
-        [SerializeField] private float sideGHeight;
+        [SerializeField] private float sideGeometryHeight;
 
         private IBorder border;
         private FloorPlanCreator floorPlanCreator = new();
+        private Wall wall;
 
         private void OnDrawGizmos()
         {
@@ -52,7 +49,7 @@ namespace WallSystem.Runtime
 
         public Wall CreateWallWithMeshes(List<Vector3> borderPoints, bool closed = false)
         {
-            Wall wall = CreateWallFromPoints(borderPoints);
+            wall = CreateWallFromPoints(borderPoints);
             if(!closed) wall.ModifyIntoOpenWall();
 
             foreach (WallSegment wallSegment in wall.GetWallSegments())
@@ -60,27 +57,24 @@ namespace WallSystem.Runtime
                 
                 wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
                 wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
-                WallMeshGenerator.GenerateTopDynamicGeometry(wallSegment, topOfWallG, topLookRotation, spreadGeometry);
-                WallMeshGenerator.GenerateFrontDynamicGeometry(wallSegment, topOfWallG, frontSideLookRotation, sideGHeight, spreadGeometry);
-                WallMeshGenerator.GenerateBackDynamicGeometry(wallSegment, topOfWallG, backSideLookRotation, sideGHeight, spreadGeometry);
             }
 
             return wall;
         }
 
-        [ContextMenu("CreateRandomWallFromPoints")]
-        private void CreateRandomWallFromPoints()
+        [Button]
+        public void CreateRandomWallFromPoints()
         {
             CreateWallFromPoints(RecalculateCircle());
         }
 
-        [ContextMenu("CreateRandomWallWithMeshFromPoints")]
-        private void CreateRandomWallWithMeshFromPoints()
+        [Button]
+        public void CreateRandomWallWithMeshFromPoints()
         {
             CreateWallWithMeshes(RecalculateCircle(), isItClosedWall);
         }
 
-        private List<Vector3> RecalculateCircle()
+        public List<Vector3> RecalculateCircle()
         {
             List<Vector3> positions = new List<Vector3>();
 
@@ -95,6 +89,29 @@ namespace WallSystem.Runtime
             }
 
             return positions;
+        }
+
+        public void AddTopGeo()
+        {
+            foreach (WallSegment wallSegment in wall.GetWallSegments())
+            {
+                WallMeshGenerator.GenerateTopDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, spreadGeometry);
+            }
+        }
+
+        public void AddFrontGeo()
+        {
+            foreach (WallSegment wallSegment in wall.GetWallSegments())
+            {
+                WallMeshGenerator.GenerateFrontDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, sideGeometryHeight, spreadGeometry);
+            }
+        }
+        public void AddBackGeo()
+        {
+            foreach (WallSegment wallSegment in wall.GetWallSegments())
+            {
+                WallMeshGenerator.GenerateBackDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, sideGeometryHeight, spreadGeometry);
+            }
         }
     }
 }
