@@ -12,9 +12,21 @@ namespace WallSystem
         [SerializeField] private float tolerance;
 
         [Header("Wall Settings")]
+        [SerializeField] private bool isItClosedWall;
         [SerializeField] private float wallHeight;
         [SerializeField] private float wallWidth;
         [SerializeField] private Material wallMaterial;
+
+        [Header("Top of Wall Settings")]
+        [SerializeField] private bool spreadGeometry;
+        [SerializeField] private Vector3 topLookRotation;
+        [SerializeField] private GameObject topOfWallG;
+
+        [Header("Side of Wall Settings")]
+        [SerializeField] private bool spreadGeometrySide;
+        [SerializeField] private Vector3 frontSideLookRotation;
+        [SerializeField] private Vector3 backSideLookRotation;
+        [SerializeField] private float sideGHeight;
 
         private IBorder border;
         private FloorPlanCreator floorPlanCreator = new();
@@ -43,10 +55,14 @@ namespace WallSystem
             Wall wall = CreateWallFromPoints(borderPoints);
             if(!closed) wall.ModifyIntoOpenWall();
 
-            foreach(WallSegment wallSegment in wall.GetWallSegments())
-            {
+            foreach (WallSegment wallSegment in wall.GetWallSegments())
+            { 
+                
                 wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
                 wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
+                WallMeshGenerator.GenerateTopDynamicGeometry(wallSegment, topOfWallG, topLookRotation, spreadGeometry);
+                WallMeshGenerator.GenerateFrontDynamicGeometry(wallSegment, topOfWallG, frontSideLookRotation, sideGHeight, spreadGeometry);
+                WallMeshGenerator.GenerateBackDynamicGeometry(wallSegment, topOfWallG, backSideLookRotation, sideGHeight, spreadGeometry);
             }
 
             return wall;
@@ -61,7 +77,7 @@ namespace WallSystem
         [ContextMenu("CreateRandomWallWithMeshFromPoints")]
         private void CreateRandomWallWithMeshFromPoints()
         {
-            CreateWallWithMeshes(RecalculateCircle());
+            CreateWallWithMeshes(RecalculateCircle(), isItClosedWall);
         }
 
         private List<Vector3> RecalculateCircle()

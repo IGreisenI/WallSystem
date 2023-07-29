@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace WallSystem
 {
-    public class WallMeshGenerator
+    public class WallMeshGenerator : MonoBehaviour
     {
         public static Mesh GenerateCubicalMesh(WallSegment wallSegment)
         {
@@ -106,6 +106,66 @@ namespace WallSystem
             mesh.RecalculateNormals();
 
             return mesh;
+        }
+
+        public static void GenerateTopDynamicGeometry(WallSegment wallSegment, GameObject topOfWallG, Vector3 lookRotation, bool spreadGeometry = false)
+        {
+            List<Vector3> verticies = wallSegment.GetAllPoints();
+
+            Vector3 firstSideTopVector = (verticies[7] - verticies[3]) / 2 + verticies[3];
+            Vector3 secondSideTopVector = (verticies[6] - verticies[2]) / 2 + verticies[2];
+
+            GenerateDynamicGeometry(wallSegment, topOfWallG, firstSideTopVector, secondSideTopVector, lookRotation, spreadGeometry);
+        }
+
+        public static void GenerateFrontDynamicGeometry(WallSegment wallSegment, GameObject sideOfWallG, Vector3 lookRotation, float height, bool spreadGeometry = false)
+        {
+            List<Vector3> verticies = wallSegment.GetAllPoints();
+
+            Vector3 firstSideTopVector = (verticies[3] - verticies[0]).normalized * height + verticies[0];
+            Vector3 secondSideTopVector = (verticies[2] - verticies[1]).normalized * height + verticies[1];
+
+            GenerateDynamicGeometry(wallSegment, sideOfWallG, firstSideTopVector, secondSideTopVector, lookRotation, spreadGeometry);
+
+        }
+
+        public static void GenerateBackDynamicGeometry(WallSegment wallSegment, GameObject sideOfWallG, Vector3 lookRotation, float height, bool spreadGeometry = false)
+        {
+            List<Vector3> verticies = wallSegment.GetAllPoints();
+
+            Vector3 firstSideTopVector = (verticies[7] - verticies[4]).normalized * height + verticies[4];
+            Vector3 secondSideTopVector = (verticies[6] - verticies[5]).normalized * height + verticies[5];
+
+            GenerateDynamicGeometry(wallSegment,sideOfWallG, firstSideTopVector, secondSideTopVector, lookRotation, spreadGeometry);
+        }
+
+        private static void GenerateDynamicGeometry(WallSegment wallSegment, GameObject sideOfWallG, Vector3 firstSideTopVector, Vector3 secondSideTopVector, Vector3 lookVector, bool spreadGeometry = false)
+        {
+            float extraSpacePerG = 0f;
+
+            Vector3 actualLookVector = wallSegment.GetForwardVector() * lookVector.z + wallSegment.GetRightVector() * lookVector.x + wallSegment.GetUpVector() * lookVector.y;
+
+            Vector3 middleVector = secondSideTopVector - firstSideTopVector;
+
+            Vector3 boundsSize = sideOfWallG.GetComponent<MeshFilter>().sharedMesh.bounds.size;
+            float axisBoundScaled = Vector3.Dot(boundsSize, lookVector) * Vector3.Dot(sideOfWallG.transform.localScale, lookVector);
+
+            Quaternion localSpaceRotation = Quaternion.FromToRotation(wallSegment.GetForwardVector(), actualLookVector.normalized);
+
+            if (spreadGeometry)
+            {
+                extraSpacePerG = (middleVector.magnitude % axisBoundScaled) / ((int)(middleVector.magnitude / axisBoundScaled));
+            }
+
+            float adjustedSpacing = axisBoundScaled + extraSpacePerG;
+
+            float currSpacing = adjustedSpacing / 2;
+
+            for (int i = 0; i < ((int)(middleVector.magnitude / axisBoundScaled)); i++)
+            {
+
+                Instantiate(sideOfWallG, firstSideTopVector + middleVector.normalized * (i * adjustedSpacing + currSpacing), localSpaceRotation, wallSegment.transform);
+            }
         }
     }
 }

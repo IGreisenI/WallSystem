@@ -55,6 +55,21 @@ namespace WallSystem
             return _allPoints;
         }
 
+        public Vector3 GetForwardVector()
+        {
+            return Vector3.Cross(_secondGroundPoint - _firstGroundPoint, _firstGroundPoint + _wallSegmentHeightVector - _firstGroundPoint).normalized;
+        }
+
+        public Vector3 GetRightVector()
+        {
+            return (_firstGroundPoint - _secondGroundPoint).normalized;
+        }
+
+        public Vector3 GetUpVector()
+        {
+            return _wallSegmentHeightVector.normalized;
+        }
+
         public void DrawWallGizmos()
         {
             Gizmos.color = Color.green;
