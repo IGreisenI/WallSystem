@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
-using WallSystem.Interfaces;
+using WallSystem.Runtime.Interfaces;
 
-namespace WallSystem
+namespace WallSystem.Runtime
 {
     public class FloorPlanCreator
     {

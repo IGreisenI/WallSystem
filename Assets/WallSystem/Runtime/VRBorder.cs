@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
-using WallSystem.Interfaces;
+using WallSystem.Runtime.Interfaces;
 
-namespace WallSystem
+namespace WallSystem.Runtime
 {
     public class VRBorder : IBorder
     {

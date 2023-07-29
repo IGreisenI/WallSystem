@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace WallSystem
+namespace WallSystem.Runtime
 {
     public class WallMeshGenerator : MonoBehaviour
     {

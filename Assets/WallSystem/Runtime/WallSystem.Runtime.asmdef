@@ -1,11 +1,9 @@
 {
-    "name": "DrawingWalls",
+    "name": "WallSystem.Runtime",
     "rootNamespace": "",
     "references": [
-        "GUID:4dcc76219c62489488de3f52e18d4729",
-        "GUID:7244dde6f3c2c034dbdeed988bd99d08",
-        "GUID:776d03a35f1b52c4a9aed9f56d7b4229",
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:4847341ff46394e83bb78fbd0652937e",
+        "GUID:e40ba710768534012815d3193fa296cb"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

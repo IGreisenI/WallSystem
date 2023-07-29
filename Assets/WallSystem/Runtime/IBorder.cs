@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace WallSystem.Interfaces
+namespace WallSystem.Runtime.Interfaces
 {
     public interface IBorder
     {

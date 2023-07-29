@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using WallSystem.Interfaces;
+using WallSystem.Runtime.Interfaces;
 
-namespace WallSystem
+namespace WallSystem.Runtime
 {
     public class WallCreator : MonoBehaviour
     {

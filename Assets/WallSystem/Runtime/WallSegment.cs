@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace WallSystem
+namespace WallSystem.Runtime
 {
     public class WallSegment : MonoBehaviour
     {
