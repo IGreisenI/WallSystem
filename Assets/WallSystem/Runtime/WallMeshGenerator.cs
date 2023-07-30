@@ -110,20 +110,20 @@ namespace WallSystem.Runtime
 
         public static void GenerateTopDynamicGeometry(WallSegment wallSegment, GameObject topOfWallG, Vector3 lookRotation, bool spreadGeometry = false)
         {
-            List<Vector3> verticies = wallSegment.GetVerticies();
+            WallPoints wallPoints = wallSegment.GetWallPoints();
 
-            Vector3 firstSideTopVector = (verticies[7] - verticies[3]) / 2 + verticies[3];
-            Vector3 secondSideTopVector = (verticies[6] - verticies[2]) / 2 + verticies[2];
+            Vector3 firstSideTopVector = (wallPoints.firstBackHeightPoint - wallPoints.firstFrontHeightPoint) / 2 + wallPoints.firstFrontHeightPoint;
+            Vector3 secondSideTopVector = (wallPoints.secondBackHeightPoint - wallPoints.secondFrontHeightPoint) / 2 + wallPoints.secondFrontHeightPoint;
 
             GenerateDynamicGeometry(wallSegment, topOfWallG, firstSideTopVector, secondSideTopVector, lookRotation, spreadGeometry);
         }
 
         public static void GenerateFrontDynamicGeometry(WallSegment wallSegment, GameObject sideOfWallG, Vector3 lookRotation, float height, bool spreadGeometry = false)
         {
-            List<Vector3> verticies = wallSegment.GetVerticies();
+            WallPoints wallPoints = wallSegment.GetWallPoints();
 
-            Vector3 firstSideTopVector = (verticies[3] - verticies[0]).normalized * height + verticies[0];
-            Vector3 secondSideTopVector = (verticies[2] - verticies[1]).normalized * height + verticies[1];
+            Vector3 firstSideTopVector = (wallPoints.firstFrontHeightPoint - wallPoints.firstFrontGroundPoint).normalized * height + wallPoints.firstFrontGroundPoint;
+            Vector3 secondSideTopVector = (wallPoints.secondFrontHeightPoint - wallPoints.secondFrontGroundPoint).normalized * height + wallPoints.secondFrontGroundPoint;
 
             GenerateDynamicGeometry(wallSegment, sideOfWallG, firstSideTopVector, secondSideTopVector, lookRotation, spreadGeometry);
 
@@ -131,10 +131,10 @@ namespace WallSystem.Runtime
 
         public static void GenerateBackDynamicGeometry(WallSegment wallSegment, GameObject sideOfWallG, Vector3 lookRotation, float height, bool spreadGeometry = false)
         {
-            List<Vector3> verticies = wallSegment.GetVerticies();
+            WallPoints wallPoints = wallSegment.GetWallPoints();
 
-            Vector3 firstSideTopVector = (verticies[7] - verticies[4]).normalized * height + verticies[4];
-            Vector3 secondSideTopVector = (verticies[6] - verticies[5]).normalized * height + verticies[5];
+            Vector3 firstSideTopVector = (wallPoints.firstBackHeightPoint - wallPoints.firstBackGroundPoint).normalized * height + wallPoints.firstBackGroundPoint;
+            Vector3 secondSideTopVector = (wallPoints.secondBackHeightPoint - wallPoints.secondBackGroundPoint).normalized * height + wallPoints.secondBackGroundPoint;
 
             GenerateDynamicGeometry(wallSegment,sideOfWallG, firstSideTopVector, secondSideTopVector, lookRotation, spreadGeometry);
         }

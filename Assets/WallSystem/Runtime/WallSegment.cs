@@ -37,7 +37,7 @@ namespace WallSystem.Runtime
         [SerializeField] private float _wallSegmentHeight;
         [SerializeField] private float _wallSegmentWidth;
 
-        private Vector3 _wallSegmentHeightVector;
+        [SerializeField, HideInInspector] private Vector3 _wallSegmentHeightVector;
         private List<Vector3> _allPoints;
 
         public void Init(Vector3 firstGroundPoint, Vector3 secondGroundPoint, float wallSegmentHeight)

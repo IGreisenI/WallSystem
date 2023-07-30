@@ -14,10 +14,10 @@ namespace WallSystem.Editor
         private Wall wall;
 
         [Header("Dynamic Geometry Settings")]
-        [SerializeField] private GameObject dynamicGeometry;
-        [SerializeField] private Vector3 geometryLookRotation;
-        [SerializeField] private bool spreadGeometry;
-        [SerializeField] private float sideGeometryHeight;
+        private SerializedProperty dynamicGeometryProp;
+        private SerializedProperty geometryLookRotationProp;
+        private SerializedProperty spreadGeometryProp;
+        private SerializedProperty sideGeometryHeightProp;
 
         private void OnEnable()
         {
@@ -45,28 +45,23 @@ namespace WallSystem.Editor
 
         private void AddObjectPlacing(WallSegment wallSegment, Vector3 frontGroundPoint, Vector3 backGroundPoint, Vector3 heightVector, Event guiEvent, Ray ray)
         {
-            float minDotToAnchor = .9999f;
             Vector3 lookVector = frontGroundPoint - backGroundPoint;
             Vector3 position = (backGroundPoint - frontGroundPoint) / 2 + heightVector + frontGroundPoint;
 
-            Vector3 fromCameraToPoint = position - ray.origin;
-            Vector3 fromCameraInDir = ray.direction * 10;
+            // Extract constant variables
+            float sphereRadius = Mathf.Min(Vector3.Distance(SceneView.lastActiveSceneView.camera.transform.position, position) * 0.01f, 1.5f);
 
-            float dot = Vector3.Dot(fromCameraToPoint.normalized, fromCameraInDir.normalized);
+            float sphereGizmoSize = 1f;
+
+            bool isMouseOver = HandleUtility.DistanceToCircle(position, sphereRadius) < 1f; // Adjust the threshold as needed
+                                                                                             // Set the color based on whether the mouse is hovering or not
             Handles.color = Color.black;
-            Handles.DrawSolidDisc(position, fromCameraToPoint.normalized, 0.5f);
 
-            if (dot > minDotToAnchor)
+            // Use Event.current.button to check for right-click
+            if (Handles.Button(position, Quaternion.identity, sphereRadius * (isMouseOver ? 2f : 1.5f), sphereGizmoSize, Handles.SphereHandleCap))
             {
-                Handles.color = Color.gray;
-                Handles.DrawSolidDisc(position, fromCameraToPoint.normalized, 0.5f);
-
-                // If the right mouse button is clicked
-                if (guiEvent.type == EventType.MouseDown && guiEvent.button == 1)
-                {
-                    Undo.RecordObject(wallSegment, "SelectObject");
-                    EditorWindow.GetWindow<ObjectPlacerWindow>("Custom Object Placer").SetObjectPlacer(wall, (backGroundPoint - frontGroundPoint) / 2 + frontGroundPoint, lookVector);
-                }
+                Undo.RecordObject(wallSegment, "SelectObject");
+                EditorWindow.GetWindow<ObjectPlacerWindow>("Custom Object Placer").SetObjectPlacer(wall, (backGroundPoint - frontGroundPoint) / 2 + frontGroundPoint, lookVector);
             }
         }
     }
