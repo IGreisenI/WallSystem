@@ -15,7 +15,7 @@ namespace WallSystem.Runtime
             List<Vector3> vertices = new();
             for(int i = 0; i<3; i++)
             {
-                vertices.AddRange(wallSegment.GetAllPoints());
+                vertices.AddRange(wallSegment.GetVerticies());
             }
 
             //Setup Triangles
@@ -110,7 +110,7 @@ namespace WallSystem.Runtime
 
         public static void GenerateTopDynamicGeometry(WallSegment wallSegment, GameObject topOfWallG, Vector3 lookRotation, bool spreadGeometry = false)
         {
-            List<Vector3> verticies = wallSegment.GetAllPoints();
+            List<Vector3> verticies = wallSegment.GetVerticies();
 
             Vector3 firstSideTopVector = (verticies[7] - verticies[3]) / 2 + verticies[3];
             Vector3 secondSideTopVector = (verticies[6] - verticies[2]) / 2 + verticies[2];
@@ -120,7 +120,7 @@ namespace WallSystem.Runtime
 
         public static void GenerateFrontDynamicGeometry(WallSegment wallSegment, GameObject sideOfWallG, Vector3 lookRotation, float height, bool spreadGeometry = false)
         {
-            List<Vector3> verticies = wallSegment.GetAllPoints();
+            List<Vector3> verticies = wallSegment.GetVerticies();
 
             Vector3 firstSideTopVector = (verticies[3] - verticies[0]).normalized * height + verticies[0];
             Vector3 secondSideTopVector = (verticies[2] - verticies[1]).normalized * height + verticies[1];
@@ -131,7 +131,7 @@ namespace WallSystem.Runtime
 
         public static void GenerateBackDynamicGeometry(WallSegment wallSegment, GameObject sideOfWallG, Vector3 lookRotation, float height, bool spreadGeometry = false)
         {
-            List<Vector3> verticies = wallSegment.GetAllPoints();
+            List<Vector3> verticies = wallSegment.GetVerticies();
 
             Vector3 firstSideTopVector = (verticies[7] - verticies[4]).normalized * height + verticies[4];
             Vector3 secondSideTopVector = (verticies[6] - verticies[5]).normalized * height + verticies[5];

@@ -62,19 +62,27 @@ namespace WallSystem.Runtime
         public void ModifyIntoOpenWall()
         {
             _wallSegments.Remove(_wallSegments[^1]);
-            List<Vector3> firstWallSegmentPoints = _wallSegments[0].GetAllPoints();
-            List<Vector3> lastWallSegmentPoints = _wallSegments[^1].GetAllPoints();
+            WallPoints firstWallPoints = _wallSegments[0].GetWallPoints();
+            WallPoints lastWallPoints = _wallSegments[^1].GetWallPoints();
 
-            Vector3 firstDepthVector = - Vector3.Cross(firstWallSegmentPoints[1] - firstWallSegmentPoints[0], Vector3.up).normalized;
-            Vector3 lastDepthVector = Vector3.Cross(lastWallSegmentPoints[0] - lastWallSegmentPoints[1], Vector3.up).normalized;
+            Vector3 firstDepthVector = - Vector3.Cross(firstWallPoints.secondFrontGroundPoint - firstWallPoints.firstFrontGroundPoint, Vector3.up).normalized;
+            Vector3 lastDepthVector = Vector3.Cross(lastWallPoints.firstFrontGroundPoint - lastWallPoints.secondFrontGroundPoint, Vector3.up).normalized;
 
             _wallSegments[0].SetFirstDepthVector(firstDepthVector * _wallWidth);
             _wallSegments[^1].SetSecondDepthVector(lastDepthVector * _wallWidth);
         }
 
-        public void PlaceObject(GameObject selectedObject)
+        public void PlaceObject(GameObject selectedObject, Vector3 position, Vector3 lookVector)
         {
-            Instantiate(selectedObject, transform);
+            lookVector.Normalize();
+
+            // Calculate the desired rotation to face lookVector
+            Quaternion targetRotation = Quaternion.LookRotation(lookVector, Vector3.up);
+
+            // Smoothly rotate the object towards the target rotation
+
+            GameObject gameobject = Instantiate(selectedObject, position, selectedObject.transform.rotation, transform);
+            gameobject.transform.rotation = Quaternion.RotateTowards(gameobject.transform.rotation, targetRotation, 360);
         }
     }
 }

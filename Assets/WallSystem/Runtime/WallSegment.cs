@@ -5,6 +5,29 @@ using System;
 
 namespace WallSystem.Runtime
 {
+    /// <summary>
+    /// Using abriviations: fbhp = firstFrontGroupPoint
+    /// 
+    /// sbhp_________________fbhp
+    ///     |\              |\
+    ///     | \_______________\ffhp
+    ///     | |sfhp     fbgp| |
+    /// sbgp\ |             \ |
+    ///  sfgp\|______________\|ffgp
+    /// 
+    /// </summary>
+    public struct WallPoints
+    {
+        public Vector3 firstFrontGroundPoint;
+        public Vector3 firstFrontHeightPoint;
+        public Vector3 firstBackGroundPoint;
+        public Vector3 firstBackHeightPoint;
+        public Vector3 secondFrontGroundPoint;
+        public Vector3 secondFrontHeightPoint;
+        public Vector3 secondBackGroundPoint;
+        public Vector3 secondBackHeightPoint;
+    }
+
     public class WallSegment : MonoBehaviour
     {
         [SerializeField] private Vector3 _firstGroundPoint;
@@ -49,10 +72,25 @@ namespace WallSystem.Runtime
             };
         }
 
-        public List<Vector3> GetAllPoints()
+        public List<Vector3> GetVerticies()
         {
             if(_allPoints == null) CalculateAllPoints();
             return _allPoints;
+        }
+
+        public WallPoints GetWallPoints()
+        {
+            return new()
+            {
+                firstFrontGroundPoint = _firstGroundPoint,
+                firstFrontHeightPoint = _firstGroundPoint + _wallSegmentHeightVector,
+                firstBackGroundPoint = _firstGroundPoint + _firstDepthVector,
+                firstBackHeightPoint = _firstGroundPoint + _wallSegmentHeightVector + _firstDepthVector,
+                secondFrontGroundPoint = _secondGroundPoint,
+                secondFrontHeightPoint = _secondGroundPoint + _wallSegmentHeightVector,
+                secondBackGroundPoint = _secondGroundPoint + _secondDepthVector,
+                secondBackHeightPoint = _secondGroundPoint + _wallSegmentHeightVector + _secondDepthVector
+            };
         }
 
         public Vector3 GetForwardVector()

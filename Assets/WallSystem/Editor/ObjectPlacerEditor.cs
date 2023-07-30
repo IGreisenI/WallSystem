@@ -2,6 +2,8 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using WallSystem.Editor;
 using WallSystem.Runtime;
 
 namespace WallSystem.Editor
@@ -31,15 +33,21 @@ namespace WallSystem.Editor
 
             foreach(WallSegment wallSegment in wall.GetWallSegments())
             {
-                AddObjectPlacing(wallSegment, guiEvent, ray);
+                WallPoints wallPoints = wallSegment.GetWallPoints();
+
+                AddObjectPlacing(wallSegment, wallPoints.firstFrontGroundPoint, wallPoints.firstBackGroundPoint, (wallPoints.firstFrontHeightPoint - wallPoints.firstFrontGroundPoint)/2, guiEvent, ray);
             }
+
+            // Place last handle on the end of the last segment to support open walls
+            WallPoints points = wall.GetWallSegments()[^1].GetWallPoints();
+            AddObjectPlacing(wall.GetWallSegments()[^1], points.secondFrontGroundPoint, points.secondBackGroundPoint, (points.secondFrontHeightPoint - points.secondFrontGroundPoint) / 2, guiEvent, ray);
         }
 
-        private void AddObjectPlacing(WallSegment wallSegment, Event guiEvent, Ray ray)
+        private void AddObjectPlacing(WallSegment wallSegment, Vector3 frontGroundPoint, Vector3 backGroundPoint, Vector3 heightVector, Event guiEvent, Ray ray)
         {
             float minDotToAnchor = .9999f;
-            List<Vector3> points = wallSegment.GetAllPoints();
-            Vector3 position = (points[4] - points[0]) / 2 + (points[3] - points[0]) / 2 + points[0];
+            Vector3 lookVector = frontGroundPoint - backGroundPoint;
+            Vector3 position = (backGroundPoint - frontGroundPoint) / 2 + heightVector + frontGroundPoint;
 
             Vector3 fromCameraToPoint = position - ray.origin;
             Vector3 fromCameraInDir = ray.direction * 10;
@@ -57,7 +65,7 @@ namespace WallSystem.Editor
                 if (guiEvent.type == EventType.MouseDown && guiEvent.button == 1)
                 {
                     Undo.RecordObject(wallSegment, "SelectObject");
-                    EditorWindow.GetWindow<ObjectPlacerWindow>("Custom Object Placer").SetObjectPlacer(wall);
+                    EditorWindow.GetWindow<ObjectPlacerWindow>("Custom Object Placer").SetObjectPlacer(wall, (backGroundPoint - frontGroundPoint) / 2 + frontGroundPoint, lookVector);
                 }
             }
         }
