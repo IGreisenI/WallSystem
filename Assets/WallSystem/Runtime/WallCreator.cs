@@ -24,7 +24,7 @@ namespace WallSystem.Runtime
         [SerializeField] private bool spreadGeometry;
         [SerializeField] private float sideGeometryHeight;
 
-        private IBorder border;
+        private IBorder border; // Still useful, gonna do vr on it
         private FloorPlanCreator floorPlanCreator = new();
         private Wall wall;
 
@@ -91,6 +91,7 @@ namespace WallSystem.Runtime
             return positions;
         }
 
+        [Button]
         public void AddTopGeo()
         {
             foreach (WallSegment wallSegment in wall.GetWallSegments())
@@ -99,6 +100,7 @@ namespace WallSystem.Runtime
             }
         }
 
+        [Button]
         public void AddFrontGeo()
         {
             foreach (WallSegment wallSegment in wall.GetWallSegments())
@@ -106,6 +108,8 @@ namespace WallSystem.Runtime
                 WallMeshGenerator.GenerateFrontDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, sideGeometryHeight, spreadGeometry);
             }
         }
+
+        [Button]
         public void AddBackGeo()
         {
             foreach (WallSegment wallSegment in wall.GetWallSegments())

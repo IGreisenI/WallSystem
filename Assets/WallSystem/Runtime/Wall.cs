@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -69,6 +70,11 @@ namespace WallSystem.Runtime
 
             _wallSegments[0].SetFirstDepthVector(firstDepthVector * _wallWidth);
             _wallSegments[^1].SetSecondDepthVector(lastDepthVector * _wallWidth);
+        }
+
+        public void PlaceObject(GameObject selectedObject)
+        {
+            Instantiate(selectedObject, transform);
         }
     }
 }
