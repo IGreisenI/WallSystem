@@ -47,19 +47,39 @@ namespace WallSystem.Runtime
             {
                 if (i > 0)
                 {
-                    tempBetweenVector = (wallPoints[(i + 1) % wallPoints.Count] - wallPoints[i]).normalized + (wallPoints[i - 1] - wallPoints[i]).normalized;
+                    Vector3 forwardVector = (wallPoints[i] - wallPoints[i - 1]);
+                    Vector3 rightVector = Vector3.Cross(forwardVector, Vector3.up);
+                    if(Vector3.Dot(wallPointsNormals[^1], rightVector) < 0)
+                    {
+                        rightVector = -rightVector;
+                    }
+
+                    tempBetweenVector = (wallPoints[(i + 1) % wallPoints.Count] - wallPoints[i]).normalized + (wallPoints[i - 1] - wallPoints[i]).normalized; 
+                    if (Vector3.Dot(tempBetweenVector, rightVector) < 0)
+                    {
+                        tempBetweenVector = -tempBetweenVector;
+                    }
                 }
                 else if (i == 0)
                 {
                     tempBetweenVector = (wallPoints[1] - wallPoints[0]).normalized + (wallPoints[wallPoints.Count - 1] - wallPoints[0]).normalized;
-                }
-
-                if (ContainsPoint(wallPoints[i] + tempBetweenVector.normalized * 0.001f))
-                {
-                    tempBetweenVector = -tempBetweenVector;
+                    if (ContainsPoint(wallPoints[i] + tempBetweenVector.normalized * 0.001f))
+                    {
+                        tempBetweenVector = -tempBetweenVector;
+                    }
                 }
 
                 wallPointsNormals.Add(tempBetweenVector.normalized);
+            }
+
+            Vector3 forward = (wallPoints[1] - wallPoints[0]);
+            Vector3 right = Vector3.Cross(forward, Vector3.up);
+            if (Vector3.Dot(wallPointsNormals[0], right) > 0)
+            {
+                for(int i = 0; i < wallPointsNormals.Count; i++)
+                {
+                    wallPointsNormals[i] = -wallPointsNormals[i].normalized;
+                }
             }
         }
 
@@ -68,7 +88,18 @@ namespace WallSystem.Runtime
         /// </summary>
         private void ReversePointsIfFloorPlanDrawnFromRightToLeft()
         {
-            if (!ContainsPoint(wallPoints[0] + ((wallPoints[1] - wallPoints[0]) / 2 + Vector3.Cross(wallPoints[1] - wallPoints[0], Vector3.up) * 0.01f)))
+
+            int count = wallPoints.Count;
+            float area = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 point1 = wallPoints[i];
+                Vector3 point2 = wallPoints[(i + 1) % count];
+                area += (point2.x - point1.x) * (point2.z + point1.z);
+            }
+
+            if (area > 0)
             {
                 wallPoints.Reverse();
             }

@@ -2175,17 +2175,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 557a754b49ba3ba4a9c47ee71ef02fd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfPoints: 20
+  numberOfPoints: 10
   radius: 30
-  tolerance: 1
+  tolerance: 0
   isItClosedWall: 0
-  wallHeight: 12
-  wallWidth: 4
+  wallHeight: 10
+  wallWidth: 2
   wallMaterial: {fileID: 2100000, guid: 7babb15a0d27e4348a084bff40ad4706, type: 2}
   dynamicGeometry: {fileID: 1739332906}
   geometryLookRotation: {x: 0, y: 1, z: 0}
   spreadGeometry: 1
   sideGeometryHeight: 2.5
+  cornerPieceGeometry: {fileID: 100000, guid: 32311d0811c6d7d46a7ff6143a99818f, type: 3}
 --- !u!224 &1964602102
 RectTransform:
   m_ObjectHideFlags: 0

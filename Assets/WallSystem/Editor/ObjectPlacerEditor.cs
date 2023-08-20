@@ -1,9 +1,6 @@
-using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
-using WallSystem.Editor;
+using UnityEngine.Rendering;
 using WallSystem.Runtime;
 
 namespace WallSystem.Editor
@@ -13,15 +10,31 @@ namespace WallSystem.Editor
     {
         private Wall wall;
 
-        [Header("Dynamic Geometry Settings")]
-        private SerializedProperty dynamicGeometryProp;
-        private SerializedProperty geometryLookRotationProp;
-        private SerializedProperty spreadGeometryProp;
-        private SerializedProperty sideGeometryHeightProp;
+        private string[] _tabs = { "Moving", "Placing" };
+        private int _tabsSelected = -1;
 
         private void OnEnable()
         {
             wall = (Wall)target;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            GUILayout.BeginVertical(EditorStyles.helpBox);
+
+            // Section header
+            GUIStyle sectionHeaderStyle = new GUIStyle(EditorStyles.boldLabel);
+            sectionHeaderStyle.fontSize = 12;
+            GUILayout.Label("Modes:", sectionHeaderStyle);
+
+            EditorGUILayout.BeginVertical();
+            _tabsSelected = GUILayout.Toolbar(_tabsSelected, _tabs);
+            EditorGUILayout.EndVertical();
+
+            GUILayout.EndVertical();
+
         }
 
         private void OnSceneGUI()
@@ -31,37 +44,48 @@ namespace WallSystem.Editor
             // Cast a ray from the camera to the mouse position
             Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
 
-            foreach(WallSegment wallSegment in wall.GetWallSegments())
+            foreach (CornerPiece cornerPiece in wall.GetCornerPieces())
             {
-                WallPoints wallPoints = wallSegment.GetWallPoints();
-
-                AddObjectPlacing(wallSegment, wallPoints.firstFrontGroundPoint, wallPoints.firstBackGroundPoint, (wallPoints.firstFrontHeightPoint - wallPoints.firstFrontGroundPoint)/2, guiEvent, ray);
+                if (_tabsSelected == 0)
+                {
+                    AddCornerHandles(cornerPiece);
+                }
+                else
+                {
+                    AddCornerObjectPlacing(cornerPiece);
+                }
             }
-
-            // Place last handle on the end of the last segment to support open walls
-            WallPoints points = wall.GetWallSegments()[^1].GetWallPoints();
-            AddObjectPlacing(wall.GetWallSegments()[^1], points.secondFrontGroundPoint, points.secondBackGroundPoint, (points.secondFrontHeightPoint - points.secondFrontGroundPoint) / 2, guiEvent, ray);
         }
 
-        private void AddObjectPlacing(WallSegment wallSegment, Vector3 frontGroundPoint, Vector3 backGroundPoint, Vector3 heightVector, Event guiEvent, Ray ray)
+        private void AddCornerObjectPlacing(CornerPiece cornerPiece)
         {
-            Vector3 lookVector = frontGroundPoint - backGroundPoint;
-            Vector3 position = (backGroundPoint - frontGroundPoint) / 2 + heightVector + frontGroundPoint;
+            Vector3 sphereHandleCapPosition = cornerPiece.transform.position;
 
             // Extract constant variables
-            float sphereRadius = Mathf.Min(Vector3.Distance(SceneView.lastActiveSceneView.camera.transform.position, position) * 0.01f, 1.5f);
+            float sphereRadius = Mathf.Min(Vector3.Distance(SceneView.lastActiveSceneView.camera.transform.position, sphereHandleCapPosition) * 0.01f, 1.5f);
 
             float sphereGizmoSize = 1f;
 
-            bool isMouseOver = HandleUtility.DistanceToCircle(position, sphereRadius) < 1f; // Adjust the threshold as needed
+            bool isMouseOver = HandleUtility.DistanceToCircle(sphereHandleCapPosition, sphereRadius) < 1f; // Adjust the threshold as needed
                                                                                              // Set the color based on whether the mouse is hovering or not
             Handles.color = Color.black;
 
             // Use Event.current.button to check for right-click
-            if (Handles.Button(position, Quaternion.identity, sphereRadius * (isMouseOver ? 2f : 1.5f), sphereGizmoSize, Handles.SphereHandleCap))
+            if (Handles.Button(sphereHandleCapPosition, Quaternion.identity, sphereRadius * (isMouseOver ? 2f : 1.5f), sphereGizmoSize, Handles.SphereHandleCap))
             {
-                Undo.RecordObject(wallSegment, "SelectObject");
-                EditorWindow.GetWindow<ObjectPlacerWindow>("Custom Object Placer").SetObjectPlacer(wall, (backGroundPoint - frontGroundPoint) / 2 + frontGroundPoint, lookVector);
+                Undo.RecordObject(cornerPiece, "SelectObject");
+                EditorWindow.GetWindow<ObjectPlacerWindow>("Custom Object Placer").SetObjectPlacer(cornerPiece);
+            }
+        }
+
+        private void AddCornerHandles(CornerPiece cornerPiece)
+        {
+            Vector3 newPosition = Handles.PositionHandle(cornerPiece.transform.position, cornerPiece.transform.rotation);
+            if (newPosition != cornerPiece.transform.position)
+            {
+                Undo.RecordObject(cornerPiece.transform, "Move CornerPiece");
+                cornerPiece.transform.position = newPosition;
+                wall.RecalculateBasedOnCornerPiece(cornerPiece);
             }
         }
     }

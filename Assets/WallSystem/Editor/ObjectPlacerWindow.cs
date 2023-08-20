@@ -9,9 +9,7 @@ namespace WallSystem.Editor
     public class ObjectPlacerWindow : EditorWindow
     {
         private GameObject _selectedObject;
-        private Wall _objectPlacer;
-        private Vector3 _objectPosition;
-        private Vector3 _lookVector;
+        private CornerPiece _cornerPiece;
         private string _nameFilter = "";
         private Vector2 _scrollPosition;
 
@@ -136,8 +134,8 @@ namespace WallSystem.Editor
 
         private void PlaceObject()
         {
-            Undo.RecordObject(_objectPlacer, "PlaceObject");
-            _objectPlacer.PlaceObject(_selectedObject, _objectPosition, _lookVector);
+            Undo.RecordObject(_cornerPiece, "PlaceObject");
+            _cornerPiece.SetModel(_selectedObject);
             Close();
         }
 
@@ -180,11 +178,9 @@ namespace WallSystem.Editor
             return filteredObjects.ToArray();
         }
 
-        public void SetObjectPlacer(Wall objectPlacer, Vector3 objectPosition, Vector3 lookVector)
+        public void SetObjectPlacer(CornerPiece cornerPiece)
         {
-            _objectPlacer = objectPlacer;
-            _objectPosition = objectPosition;
-            _lookVector = lookVector;
+            _cornerPiece = cornerPiece;
         }
     }
 }

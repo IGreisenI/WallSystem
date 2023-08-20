@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using WallSystem.Runtime.Interfaces;
 using NaughtyAttributes;
+using UnityEngine.UIElements;
 
 namespace WallSystem.Runtime
 {
@@ -24,6 +25,9 @@ namespace WallSystem.Runtime
         [SerializeField] private bool spreadGeometry;
         [SerializeField] private float sideGeometryHeight;
 
+        [Header("Corner Added Geometry Settings")]
+        [SerializeField] private GameObject cornerPieceGeometry;
+
         private IBorder border; // Still useful, gonna do vr on it
         private FloorPlanCreator floorPlanCreator = new();
         private Wall wall;
@@ -43,6 +47,8 @@ namespace WallSystem.Runtime
             for (int i = 0; i < fp.wallPoints.Count; i++)
             {
                 wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
+
+                wall.AddCornerPoint(wall.GetWallSegments()[^1].GetWallPoints());
             }
             return wall;
         }
@@ -54,9 +60,13 @@ namespace WallSystem.Runtime
 
             foreach (WallSegment wallSegment in wall.GetWallSegments())
             { 
-                
                 wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
                 wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
+            }
+
+            foreach (CornerPiece cornerPiece in wall.GetCornerPieces())
+            {
+                cornerPiece.SetModel(cornerPieceGeometry);
             }
 
             return wall;
@@ -115,6 +125,14 @@ namespace WallSystem.Runtime
             foreach (WallSegment wallSegment in wall.GetWallSegments())
             {
                 WallMeshGenerator.GenerateBackDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, sideGeometryHeight, spreadGeometry);
+            }
+        }
+        [Button]
+        public void AddCornerGeo()
+        {
+            foreach(CornerPiece cornerPiece in wall.GetCornerPieces())
+            {
+                cornerPiece.SetModel(cornerPieceGeometry);
             }
         }
     }

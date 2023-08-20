@@ -35,7 +35,7 @@ namespace WallSystem.Runtime
         [SerializeField] private Vector3 _firstDepthVector = Vector3.zero;
         [SerializeField] private Vector3 _secondDepthVector = Vector3.zero;
         [SerializeField] private float _wallSegmentHeight;
-        [SerializeField] private float _wallSegmentWidth;
+        [SerializeField] public float _wallSegmentWidth;
 
         [SerializeField, HideInInspector] private Vector3 _wallSegmentHeightVector;
         private List<Vector3> _allPoints;
@@ -55,6 +55,7 @@ namespace WallSystem.Runtime
             _wallSegmentWidth = wallSegmentWidth;
             _firstDepthVector = firstDepthVector;
             _secondDepthVector = secondDepthVector;
+            RecalculateNormalVectors();
         }
 
         private void CalculateAllPoints()
@@ -74,7 +75,7 @@ namespace WallSystem.Runtime
 
         public List<Vector3> GetVerticies()
         {
-            if(_allPoints == null) CalculateAllPoints();
+            CalculateAllPoints();
             return _allPoints;
         }
 
@@ -92,6 +93,35 @@ namespace WallSystem.Runtime
                 secondBackHeightPoint = _secondGroundPoint + _wallSegmentHeightVector + _secondDepthVector
             };
         }
+        public void DrawWallGizmos()
+        {
+            Gizmos.color = Color.green;
+
+            for(int i = 0; i < _allPoints?.Count; i++)
+            {
+                Gizmos.DrawLine(_allPoints[i], _allPoints[(i + 1) % _allPoints.Count]);
+            }
+        }
+        
+        public void RecalculateNormalVectors()
+        {
+            float angle = Vector3.Angle(_firstDepthVector.normalized, -GetForwardVector());
+            float cosine = (float)Math.Round(Mathf.Cos(angle * Mathf.Deg2Rad), 2);
+
+            if (cosine > 0)
+            {
+                float newLength = _wallSegmentWidth / cosine;
+                _firstDepthVector = _firstDepthVector.normalized * (float)Math.Round(newLength, 2);
+            }
+
+            angle = Vector3.Angle(_secondDepthVector.normalized, -GetForwardVector());
+            cosine = (float)Math.Round(Mathf.Cos(angle * Mathf.Deg2Rad), 2);
+            if (cosine > 0)
+            {
+                float newLength = _wallSegmentWidth / cosine;
+                _secondDepthVector = _secondDepthVector.normalized * (float)Math.Round(newLength, 2);
+            }
+        }
 
         public Vector3 GetForwardVector()
         {
@@ -108,16 +138,6 @@ namespace WallSystem.Runtime
             return _wallSegmentHeightVector.normalized;
         }
 
-        public void DrawWallGizmos()
-        {
-            Gizmos.color = Color.green;
-
-            for(int i = 0; i < _allPoints?.Count; i++)
-            {
-                Gizmos.DrawLine(_allPoints[i], _allPoints[(i + 1) % _allPoints.Count]);
-            }
-        }
-
         public void SetFirstDepthVector(Vector3 depthVector)
         {
             _firstDepthVector = depthVector;
@@ -128,6 +148,28 @@ namespace WallSystem.Runtime
         {
             _secondDepthVector = depthVector;
             CalculateAllPoints();
+        }
+
+        public Vector3 GetFirstDepthVector()
+        {
+            return _firstDepthVector;
+        }
+
+        public Vector3 GetSecondDepthVector()
+        {
+            return _secondDepthVector;
+        }
+
+        internal void SetFirstFrontGroundPoint(Vector3 firstGroundPoint)
+        {
+            _firstGroundPoint = firstGroundPoint;
+            RecalculateNormalVectors();
+        }
+
+        internal void SetSecondFrontGroundPoint(Vector3 secondGroundPoint)
+        {
+            _secondGroundPoint = secondGroundPoint;
+            RecalculateNormalVectors();
         }
     }
 }
