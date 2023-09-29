@@ -1,7 +1,6 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 namespace WallSystem.Runtime
 {
@@ -18,18 +17,20 @@ namespace WallSystem.Runtime
     /// </summary>
     public struct WallPoints
     {
-        public Vector3 firstFrontGroundPoint;
-        public Vector3 firstFrontHeightPoint;
-        public Vector3 firstBackGroundPoint;
-        public Vector3 firstBackHeightPoint;
-        public Vector3 secondFrontGroundPoint;
-        public Vector3 secondFrontHeightPoint;
-        public Vector3 secondBackGroundPoint;
-        public Vector3 secondBackHeightPoint;
+        public Vector3 FirstFrontGroundPoint { get; set; }
+        public Vector3 FirstFrontHeightPoint { get; set; }
+        public Vector3 FirstBackGroundPoint { get; set; }
+        public Vector3 FirstBackHeightPoint { get; set; }
+        public Vector3 SecondFrontGroundPoint { get; set; }
+        public Vector3 SecondFrontHeightPoint { get; set; }
+        public Vector3 SecondBackGroundPoint { get; set; }
+        public Vector3 SecondBackHeightPoint { get; set; }
     }
 
     public class WallSegment : MonoBehaviour
     {
+        public event Action OnVerticiesUpdated;
+
         [SerializeField] private Vector3 _firstGroundPoint;
         [SerializeField] private Vector3 _secondGroundPoint;
         [SerializeField] private Vector3 _firstDepthVector = Vector3.zero;
@@ -38,7 +39,8 @@ namespace WallSystem.Runtime
         [SerializeField] public float _wallSegmentWidth;
 
         [SerializeField, HideInInspector] private Vector3 _wallSegmentHeightVector;
-        private List<Vector3> _allPoints;
+
+        public WallPoints WallPoints { get; set; }
 
         public void Init(Vector3 firstGroundPoint, Vector3 secondGroundPoint, float wallSegmentHeight)
         {
@@ -46,6 +48,8 @@ namespace WallSystem.Runtime
             _secondGroundPoint = secondGroundPoint;
             _wallSegmentHeight = wallSegmentHeight;
             _wallSegmentHeightVector = new Vector3(0, _wallSegmentHeight);
+
+            RecalculateWallPoints();
         }
 
         public void InitWithDepth(Vector3 firstGroundPoint, Vector3 secondGroundPoint, Vector3 firstDepthVector, Vector3 secondDepthVector, float wallSegmentHeight, float wallSegmentWidth)
@@ -55,72 +59,76 @@ namespace WallSystem.Runtime
             _wallSegmentWidth = wallSegmentWidth;
             _firstDepthVector = firstDepthVector;
             _secondDepthVector = secondDepthVector;
+
             RecalculateNormalVectors();
+            RecalculateWallPoints();
         }
 
-        private void CalculateAllPoints()
-        {
-            _allPoints = new List<Vector3>
-            {
-                _firstGroundPoint,
-                _secondGroundPoint,
-                _secondGroundPoint + _wallSegmentHeightVector,
-                _firstGroundPoint + _wallSegmentHeightVector,
-                _firstGroundPoint + _firstDepthVector,
-                _secondGroundPoint + _secondDepthVector,
-                _secondGroundPoint + _wallSegmentHeightVector + _secondDepthVector,
-                _firstGroundPoint + _wallSegmentHeightVector + _firstDepthVector,
-            };
-        }
-
-        public List<Vector3> GetVerticies()
-        {
-            CalculateAllPoints();
-            return _allPoints;
-        }
-
-        public WallPoints GetWallPoints()
-        {
-            return new()
-            {
-                firstFrontGroundPoint = _firstGroundPoint,
-                firstFrontHeightPoint = _firstGroundPoint + _wallSegmentHeightVector,
-                firstBackGroundPoint = _firstGroundPoint + _firstDepthVector,
-                firstBackHeightPoint = _firstGroundPoint + _wallSegmentHeightVector + _firstDepthVector,
-                secondFrontGroundPoint = _secondGroundPoint,
-                secondFrontHeightPoint = _secondGroundPoint + _wallSegmentHeightVector,
-                secondBackGroundPoint = _secondGroundPoint + _secondDepthVector,
-                secondBackHeightPoint = _secondGroundPoint + _wallSegmentHeightVector + _secondDepthVector
-            };
-        }
         public void DrawWallGizmos()
         {
             Gizmos.color = Color.green;
 
-            for(int i = 0; i < _allPoints?.Count; i++)
+            List<Vector3> _verticies = GetVerticies();
+            for(int i = 0; i < _verticies?.Count; i++)
             {
-                Gizmos.DrawLine(_allPoints[i], _allPoints[(i + 1) % _allPoints.Count]);
+                Gizmos.DrawLine(_verticies[i], _verticies[(i + 1) % _verticies.Count]);
             }
+        }
+
+        /// <summary>
+        /// Return vertices in a specific order for geometry
+        /// </summary>
+        /// <returns></returns>
+        public List<Vector3> GetVerticies()
+        {
+            return new List<Vector3>
+            {
+                WallPoints.FirstFrontGroundPoint,
+                WallPoints.SecondFrontGroundPoint,
+                WallPoints.SecondFrontHeightPoint,
+                WallPoints.FirstFrontHeightPoint,
+                WallPoints.FirstBackGroundPoint,
+                WallPoints.SecondBackGroundPoint,
+                WallPoints.SecondBackHeightPoint,
+                WallPoints.FirstBackHeightPoint
+            };
+        }
+
+        public void RecalculateWallPoints()
+        {
+            WallPoints = new()
+            {
+                FirstFrontGroundPoint = _firstGroundPoint,
+                FirstFrontHeightPoint = _firstGroundPoint + _wallSegmentHeightVector,
+                FirstBackGroundPoint = _firstGroundPoint + _firstDepthVector,
+                FirstBackHeightPoint = _firstGroundPoint + _wallSegmentHeightVector + _firstDepthVector,
+                SecondFrontGroundPoint = _secondGroundPoint,
+                SecondFrontHeightPoint = _secondGroundPoint + _wallSegmentHeightVector,
+                SecondBackGroundPoint = _secondGroundPoint + _secondDepthVector,
+                SecondBackHeightPoint = _secondGroundPoint + _wallSegmentHeightVector + _secondDepthVector
+            };
+            OnVerticiesUpdated?.Invoke();
         }
         
         public void RecalculateNormalVectors()
         {
             float angle = Vector3.Angle(_firstDepthVector.normalized, -GetForwardVector());
             float cosine = (float)Math.Round(Mathf.Cos(angle * Mathf.Deg2Rad), 2);
+            float newLength = _wallSegmentWidth / cosine;
 
             if (cosine > 0)
             {
-                float newLength = _wallSegmentWidth / cosine;
                 _firstDepthVector = _firstDepthVector.normalized * (float)Math.Round(newLength, 2);
             }
 
             angle = Vector3.Angle(_secondDepthVector.normalized, -GetForwardVector());
             cosine = (float)Math.Round(Mathf.Cos(angle * Mathf.Deg2Rad), 2);
+            newLength = _wallSegmentWidth / cosine;
             if (cosine > 0)
             {
-                float newLength = _wallSegmentWidth / cosine;
                 _secondDepthVector = _secondDepthVector.normalized * (float)Math.Round(newLength, 2);
             }
+            OnVerticiesUpdated?.Invoke();
         }
 
         public Vector3 GetForwardVector()
@@ -138,26 +146,29 @@ namespace WallSystem.Runtime
             return _wallSegmentHeightVector.normalized;
         }
 
+        public Vector3 GetHorizontalVectorOnFrontFace()
+        {
+            return WallPoints.SecondFrontGroundPoint - WallPoints.FirstFrontGroundPoint;
+        }
+        public Vector3 GetHorizontalVectorOnBackFace()
+        {
+            return WallPoints.SecondBackGroundPoint - WallPoints.FirstBackGroundPoint;
+        }
+        public Vector3 GetHorizontalVectorOnTopFace()
+        {
+            return WallPoints.SecondFrontGroundPoint - WallPoints.FirstFrontGroundPoint;
+        }
+
         public void SetFirstDepthVector(Vector3 depthVector)
         {
             _firstDepthVector = depthVector;
-            CalculateAllPoints();
+            RecalculateWallPoints();
         }
 
         public void SetSecondDepthVector(Vector3 depthVector)
         {
             _secondDepthVector = depthVector;
-            CalculateAllPoints();
-        }
-
-        public Vector3 GetFirstDepthVector()
-        {
-            return _firstDepthVector;
-        }
-
-        public Vector3 GetSecondDepthVector()
-        {
-            return _secondDepthVector;
+            RecalculateWallPoints();
         }
 
         internal void SetFirstFrontGroundPoint(Vector3 firstGroundPoint)

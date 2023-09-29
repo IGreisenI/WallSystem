@@ -51,7 +51,7 @@ namespace WallSystem.Runtime
 
         public void AddFlatWallSegment(Vector3 firstGroundPoint, Vector3 secondGroundPoint)
         {
-            tempWallSegment = new GameObject("WallSegment").AddComponent<WallSegment>();
+            tempWallSegment = new GameObject($"WallSegment {_wallSegments.Count}").AddComponent<WallSegment>();
             tempWallSegment.transform.parent = this.transform;
 
             tempWallSegment.Init(firstGroundPoint, secondGroundPoint, _wallHeight);
@@ -61,7 +61,7 @@ namespace WallSystem.Runtime
 
         public void AddWallSegmentWithDepth(Vector3 firstGroundPoint, Vector3 secondGroundPoint, Vector3 firstDepthNormVector, Vector3 secondDepthNormVector)
         {
-            tempWallSegment = new GameObject("WallSegment").AddComponent<WallSegment>();
+            tempWallSegment = new GameObject($"WallSegment {_wallSegments.Count}").AddComponent<WallSegment>();
             tempWallSegment.transform.parent = this.transform;
 
             tempWallSegment.InitWithDepth(firstGroundPoint, secondGroundPoint, firstDepthNormVector.normalized * _wallWidth, secondDepthNormVector * _wallWidth, _wallHeight, _wallWidth);
@@ -71,11 +71,16 @@ namespace WallSystem.Runtime
         public void ModifyIntoOpenWall()
         {
             _wallSegments.Remove(_wallSegments[^1]);
-            WallPoints firstWallPoints = _wallSegments[0].GetWallPoints();
-            WallPoints lastWallPoints = _wallSegments[^1].GetWallPoints();
+            ModifyEndsIntoOpenEnds();
+        }
 
-            Vector3 firstDepthVector = Vector3.Cross(firstWallPoints.firstFrontGroundPoint - firstWallPoints.secondFrontGroundPoint, Vector3.up).normalized;
-            Vector3 lastDepthVector = Vector3.Cross(lastWallPoints.firstFrontGroundPoint - lastWallPoints.secondFrontGroundPoint, Vector3.up).normalized;
+        private void ModifyEndsIntoOpenEnds()
+        {
+            WallPoints firstWallPoints = _wallSegments[0].WallPoints;
+            WallPoints lastWallPoints = _wallSegments[^1].WallPoints;
+
+            Vector3 firstDepthVector = Vector3.Cross(firstWallPoints.FirstFrontGroundPoint - firstWallPoints.SecondFrontGroundPoint, Vector3.up).normalized;
+            Vector3 lastDepthVector = Vector3.Cross(lastWallPoints.FirstFrontGroundPoint - lastWallPoints.SecondFrontGroundPoint, Vector3.up).normalized;
 
             _wallSegments[0].SetFirstDepthVector(firstDepthVector * _wallWidth);
             _wallSegments[^1].SetSecondDepthVector(lastDepthVector * _wallWidth);
@@ -87,8 +92,8 @@ namespace WallSystem.Runtime
         public void RecalculateBasedOnCornerPiece(CornerPiece currCornerPiece)
         {
             index = _cornerPieces.FindIndex(c => c.gameObject == currCornerPiece.gameObject);
-            prevIndex = index - 1 < 0 ? _cornerPieces.Count + (index - 1) : index - 1;
             morePrevIndex = index - 2 < 0 ? _cornerPieces.Count + (index - 2) : index - 2;
+            prevIndex = index - 1 < 0 ? _cornerPieces.Count + (index - 1) : index - 1;
             nextIndex = index + 1 >= _cornerPieces.Count ? (index + 1) % _cornerPieces.Count : index + 1;
             moreNextIndex = index + 2 >= _cornerPieces.Count ? (index + 2) % _cornerPieces.Count : index + 2;
 
@@ -112,7 +117,6 @@ namespace WallSystem.Runtime
                 _wallSegments[index].SetFirstFrontGroundPoint(currFirstFrontVector);
                 _wallSegments[index].SetFirstDepthVector(cornerDepthVector);
                 _wallSegments[index].SetSecondDepthVector(nextCornerDepthVector);
-                SetModel(_wallSegments[index]);
             }
 
             if (_wallSegments.Count == _cornerPieces.Count || prevIndex != _cornerPieces.Count - 1)
@@ -120,14 +124,14 @@ namespace WallSystem.Runtime
                 _wallSegments[prevIndex].SetSecondFrontGroundPoint(currFirstFrontVector);
                 _wallSegments[prevIndex].SetFirstDepthVector(prevCornerDepthVector);
                 _wallSegments[prevIndex].SetSecondDepthVector(cornerDepthVector);
-                SetModel(_wallSegments[prevIndex]);
             }
 
             if (_wallSegments.Count == _cornerPieces.Count || nextIndex != _cornerPieces.Count - 1)
             {
                 _wallSegments[nextIndex].SetFirstDepthVector(nextCornerDepthVector);
-                SetModel(_wallSegments[nextIndex]);
             }
+
+            if (_wallSegments.Count < _cornerPieces.Count) ModifyEndsIntoOpenEnds();
         }
 
         private Vector3 CalculateDepthVector(Vector3 cornerPiece, Vector3 prevCornerPiece, Vector3 nextCornerPiece)
@@ -145,15 +149,10 @@ namespace WallSystem.Runtime
             return cornerDepthVector;
         }
 
-        public void SetModel(WallSegment wallSegment)
-        { 
-            wallSegment.gameObject.GetComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
-        }
-
         public void AddCornerPoint(WallPoints wallPoints)
         {
-            Vector3 position = (wallPoints.firstBackGroundPoint - wallPoints.firstFrontGroundPoint) / 2 + wallPoints.firstFrontGroundPoint;
-            Vector3 lookVector = wallPoints.firstFrontGroundPoint - wallPoints.firstBackGroundPoint;
+            Vector3 position = (wallPoints.FirstBackGroundPoint - wallPoints.FirstFrontGroundPoint) / 2 + wallPoints.FirstFrontGroundPoint;
+            Vector3 lookVector = wallPoints.FirstFrontGroundPoint - wallPoints.FirstBackGroundPoint;
 
             tempCornerPiece = new GameObject("CornerPiece").AddComponent<CornerPiece>();
             tempCornerPiece.transform.parent = this.transform;

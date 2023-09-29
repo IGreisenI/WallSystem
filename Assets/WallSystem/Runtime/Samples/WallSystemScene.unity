@@ -2178,15 +2178,15 @@ MonoBehaviour:
   numberOfPoints: 10
   radius: 30
   tolerance: 0
-  isItClosedWall: 0
+  isItClosedWall: 1
   wallHeight: 10
   wallWidth: 2
   wallMaterial: {fileID: 2100000, guid: 7babb15a0d27e4348a084bff40ad4706, type: 2}
   dynamicGeometry: {fileID: 1739332906}
   geometryLookRotation: {x: 0, y: 1, z: 0}
   spreadGeometry: 1
-  sideGeometryHeight: 2.5
-  cornerPieceGeometry: {fileID: 100000, guid: 32311d0811c6d7d46a7ff6143a99818f, type: 3}
+  sideGeometryHeight: 1
+  cornerPieceGeometry: {fileID: 100000, guid: 4fd178c18e99a2042b5594f81f135abf, type: 3}
 --- !u!224 &1964602102
 RectTransform:
   m_ObjectHideFlags: 0

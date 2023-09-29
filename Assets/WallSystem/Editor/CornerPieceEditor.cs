@@ -1,12 +1,11 @@
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 using WallSystem.Runtime;
 
 namespace WallSystem.Editor
 {
     [CustomEditor(typeof(Wall))]
-    public class ObjectPlacerEditor : UnityEditor.Editor
+    public class CornerPieceEditor : UnityEditor.Editor
     {
         private Wall wall;
 
@@ -34,16 +33,10 @@ namespace WallSystem.Editor
             EditorGUILayout.EndVertical();
 
             GUILayout.EndVertical();
-
         }
 
         private void OnSceneGUI()
         {
-            // Get the current event
-            Event guiEvent = Event.current;
-            // Cast a ray from the camera to the mouse position
-            Ray ray = HandleUtility.GUIPointToWorldRay(guiEvent.mousePosition);
-
             foreach (CornerPiece cornerPiece in wall.GetCornerPieces())
             {
                 if (_tabsSelected == 0)

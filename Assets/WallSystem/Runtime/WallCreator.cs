@@ -28,7 +28,7 @@ namespace WallSystem.Runtime
         [Header("Corner Added Geometry Settings")]
         [SerializeField] private GameObject cornerPieceGeometry;
 
-        private IBorder border; // Still useful, gonna do vr on it
+        private IBorder border;
         private FloorPlanCreator floorPlanCreator = new();
         private Wall wall;
 
@@ -48,7 +48,7 @@ namespace WallSystem.Runtime
             {
                 wall.AddWallSegmentWithDepth(fp.wallPoints[i], fp.wallPoints[(i + 1) % fp.wallPoints.Count], fp.wallPointsNormals[i], fp.wallPointsNormals[(i + 1) % fp.wallPointsNormals.Count]);
 
-                wall.AddCornerPoint(wall.GetWallSegments()[^1].GetWallPoints());
+                wall.AddCornerPoint(wall.GetWallSegments()[^1].WallPoints);
             }
             return wall;
         }
@@ -59,9 +59,8 @@ namespace WallSystem.Runtime
             if(!closed) wall.ModifyIntoOpenWall();
 
             foreach (WallSegment wallSegment in wall.GetWallSegments())
-            { 
-                wallSegment.gameObject.AddComponent<MeshFilter>().mesh = WallMeshGenerator.GenerateCubicalMesh(wallSegment);
-                wallSegment.gameObject.AddComponent<MeshRenderer>().material = wallMaterial;
+            {
+                wallSegment.gameObject.AddComponent<WallSegmentGeometry>().Init(wallSegment, wallMaterial);
             }
 
             foreach (CornerPiece cornerPiece in wall.GetCornerPieces())
@@ -106,7 +105,7 @@ namespace WallSystem.Runtime
         {
             foreach (WallSegment wallSegment in wall.GetWallSegments())
             {
-                WallMeshGenerator.GenerateTopDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, spreadGeometry);
+                wallSegment.GetComponent<WallSegmentGeometry>().GenerateTopDynamicGeometry(dynamicGeometry, geometryLookRotation, sideGeometryHeight);
             }
         }
 
@@ -115,7 +114,7 @@ namespace WallSystem.Runtime
         {
             foreach (WallSegment wallSegment in wall.GetWallSegments())
             {
-                WallMeshGenerator.GenerateFrontDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, sideGeometryHeight, spreadGeometry);
+                wallSegment.GetComponent<WallSegmentGeometry>().GenerateFrontDynamicGeometry(dynamicGeometry, geometryLookRotation, sideGeometryHeight);
             }
         }
 
@@ -124,7 +123,7 @@ namespace WallSystem.Runtime
         {
             foreach (WallSegment wallSegment in wall.GetWallSegments())
             {
-                WallMeshGenerator.GenerateBackDynamicGeometry(wallSegment, dynamicGeometry, geometryLookRotation, sideGeometryHeight, spreadGeometry);
+                wallSegment.GetComponent<WallSegmentGeometry>().GenerateBackDynamicGeometry(dynamicGeometry, geometryLookRotation, sideGeometryHeight);
             }
         }
         [Button]
