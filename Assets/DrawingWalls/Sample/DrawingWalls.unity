@@ -531,6 +531,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4224038346096945177, guid: f90f709bd752a194488dd5aaaf1b0168,
+        type: 3}
+      propertyPath: isItClosedWall
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4224038346096945181, guid: f90f709bd752a194488dd5aaaf1b0168,
         type: 3}
       propertyPath: m_Name
