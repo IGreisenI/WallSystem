@@ -14,7 +14,7 @@ namespace WallSystem.Runtime
         [SerializeField] private float tolerance;
 
         [Header("Wall Settings")]
-        [SerializeField] private bool isItClosedWall;
+        [SerializeField] private bool isOpenWall;
         [SerializeField] private float wallHeight;
         [SerializeField] private float wallWidth;
         [SerializeField] private Material wallMaterial;
@@ -40,7 +40,7 @@ namespace WallSystem.Runtime
         private Wall CreateWallFromPoints(List<Vector3> points)
         {
             Wall wall = new GameObject("RandomWall").AddComponent<Wall>();
-            wall.Init(wallHeight, wallWidth);
+            wall.Init(isOpenWall, wallHeight, wallWidth);
 
             FloorPlan fp = floorPlanCreator.CreateFloorPlanFromPoints(points, tolerance);
 
@@ -53,10 +53,10 @@ namespace WallSystem.Runtime
             return wall;
         }
 
-        public Wall CreateWallWithMeshes(List<Vector3> borderPoints, bool closed = false)
+        public Wall CreateWallWithMeshes(List<Vector3> borderPoints, bool isOpenWall = false)
         {
             wall = CreateWallFromPoints(borderPoints);
-            if(!closed) wall.ModifyIntoOpenWall();
+            if(isOpenWall) wall.ModifyIntoOpenWall();
 
             foreach (WallSegment wallSegment in wall.GetWallSegments())
             {
@@ -80,7 +80,7 @@ namespace WallSystem.Runtime
         [Button]
         public void CreateRandomWallWithMeshFromPoints()
         {
-            CreateWallWithMeshes(RecalculateCircle(), isItClosedWall);
+            CreateWallWithMeshes(RecalculateCircle(), isOpenWall);
         }
 
         public List<Vector3> RecalculateCircle()
