@@ -7,6 +7,7 @@ namespace WallSystem.Runtime
 {
     public class Wall : MonoBehaviour
     {
+        [SerializeField] private bool _isOpenWall;
         [SerializeField] private float _wallHeight;
         [SerializeField] private float _wallWidth;
         [SerializeField] private List<WallSegment> _wallSegments = new();
@@ -34,8 +35,9 @@ namespace WallSystem.Runtime
         Vector3 currFirstFrontVector;
         #endregion
 
-        public void Init(float wallHeight, float wallWidth)
+        public void Init(bool isOpenWall, float wallHeight, float wallWidth)
         {
+            _isOpenWall = isOpenWall;
             _wallHeight = wallHeight;
             _wallWidth = wallWidth;
             _wallSegments = new List<WallSegment>();
@@ -92,6 +94,7 @@ namespace WallSystem.Runtime
         public void RecalculateBasedOnCornerPiece(CornerPiece currCornerPiece)
         {
             index = _cornerPieces.FindIndex(c => c.gameObject == currCornerPiece.gameObject);
+
             morePrevIndex = index - 2 < 0 ? _cornerPieces.Count + (index - 2) : index - 2;
             prevIndex = index - 1 < 0 ? _cornerPieces.Count + (index - 1) : index - 1;
             nextIndex = index + 1 >= _cornerPieces.Count ? (index + 1) % _cornerPieces.Count : index + 1;
@@ -102,41 +105,46 @@ namespace WallSystem.Runtime
             nextCornerPiece = _cornerPieces[nextIndex];
             moreNextCornerPiece = _cornerPieces[moreNextIndex];
 
-            prevCornerDepthVector = CalculateDepthVector(prevCornerPiece.transform.position, morePrevCornerPiece.transform.position, currCornerPiece.transform.position);
-            cornerDepthVector = CalculateDepthVector(currCornerPiece.transform.position, prevCornerPiece.transform.position, nextCornerPiece.transform.position); 
-            nextCornerDepthVector = CalculateDepthVector(nextCornerPiece.transform.position, currCornerPiece.transform.position, moreNextCornerPiece.transform.position);
+            currFirstFrontVector = RecalculateBPoint(_wallSegments[prevIndex].WallPoints.FirstFrontGroundPoint, _wallSegments[index].WallPoints.FirstFrontGroundPoint, _wallSegments[nextIndex].WallPoints.FirstFrontGroundPoint, currCornerPiece.transform.position, _wallWidth);
 
-            currFirstFrontVector = -cornerDepthVector.normalized * (_wallWidth / 2) + currCornerPiece.transform.position;
+            prevCornerDepthVector = CalculateDepthVector(_wallSegments[prevIndex].WallPoints.FirstFrontGroundPoint, _wallSegments[morePrevIndex].WallPoints.FirstFrontGroundPoint, currFirstFrontVector);
+            cornerDepthVector = CalculateDepthVector(currFirstFrontVector, _wallSegments[prevIndex].WallPoints.FirstFrontGroundPoint, _wallSegments[nextIndex].WallPoints.FirstFrontGroundPoint);
+            nextCornerDepthVector = CalculateDepthVector(_wallSegments[nextIndex].WallPoints.FirstFrontGroundPoint, currFirstFrontVector, _wallSegments[moreNextIndex].WallPoints.FirstFrontGroundPoint);
 
+            // Update where do corner pieces look
             currCornerPiece.transform.rotation = Quaternion.LookRotation(-cornerDepthVector, Vector3.up);
             prevCornerPiece.transform.rotation = Quaternion.LookRotation(-prevCornerDepthVector, Vector3.up);
             nextCornerPiece.transform.rotation = Quaternion.LookRotation(-nextCornerDepthVector, Vector3.up);
 
-            if (_wallSegments.Count == _cornerPieces.Count || index != _cornerPieces.Count - 1)
+            if (!_isOpenWall || morePrevIndex != _cornerPieces.Count - 1)
             {
-                _wallSegments[index].SetFirstFrontGroundPoint(currFirstFrontVector);
-                _wallSegments[index].SetFirstDepthVector(cornerDepthVector);
-                _wallSegments[index].SetSecondDepthVector(nextCornerDepthVector);
+                _wallSegments[morePrevIndex].SetSecondDepthVector(prevCornerDepthVector);
             }
 
-            if (_wallSegments.Count == _cornerPieces.Count || prevIndex != _cornerPieces.Count - 1)
+            if (!_isOpenWall || prevIndex != _cornerPieces.Count - 1)
             {
                 _wallSegments[prevIndex].SetSecondFrontGroundPoint(currFirstFrontVector);
                 _wallSegments[prevIndex].SetFirstDepthVector(prevCornerDepthVector);
                 _wallSegments[prevIndex].SetSecondDepthVector(cornerDepthVector);
             }
 
-            if (_wallSegments.Count == _cornerPieces.Count || nextIndex != _cornerPieces.Count - 1)
+            if (!_isOpenWall || index != _cornerPieces.Count - 1)
+            {
+                _wallSegments[index].SetFirstFrontGroundPoint(currFirstFrontVector);
+                _wallSegments[index].SetFirstDepthVector(cornerDepthVector);
+                _wallSegments[index].SetSecondDepthVector(nextCornerDepthVector);
+            }
+
+            if (!_isOpenWall || nextIndex != _cornerPieces.Count - 1)
             {
                 _wallSegments[nextIndex].SetFirstDepthVector(nextCornerDepthVector);
             }
 
-            if (_wallSegments.Count < _cornerPieces.Count) ModifyEndsIntoOpenEnds();
+            if (_isOpenWall) ModifyEndsIntoOpenEnds();
         }
 
         private Vector3 CalculateDepthVector(Vector3 cornerPiece, Vector3 prevCornerPiece, Vector3 nextCornerPiece)
         {
-
             // Take in consideration that the corner piece is in the middle of the wall to get the new normal
             Vector3 cornerDepthVector = (nextCornerPiece - cornerPiece).normalized + (prevCornerPiece - cornerPiece).normalized;
             Vector3 forwardVector = (prevCornerPiece - cornerPiece);
@@ -145,13 +153,36 @@ namespace WallSystem.Runtime
             {
                 cornerDepthVector = -cornerDepthVector;
             }
+
             cornerDepthVector = cornerDepthVector.normalized * _wallWidth;
             return cornerDepthVector;
         }
 
+        Vector3 RecalculateBPoint(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 movedMiddlePoint, float wallThickness)
+        {
+            Vector3 AB = pointB - pointA;
+            Vector3 BC = pointC - pointB;
+
+            // Calculate the angle between vectors AB and BC (in degrees).
+            float angle = Vector3.Angle(AB, BC);
+
+            // Calculate the direction from point B to the moved middle point.
+            Vector3 direction = (movedMiddlePoint - pointB).normalized;
+
+            // Calculate the new position of point B.
+            Vector3 newB = movedMiddlePoint + direction * (wallThickness / 2.0f);
+
+            return newB;
+        }
+
+        Vector3 CalculateCornerPosition(WallPoints wallPoints)
+        {
+            return (wallPoints.FirstBackGroundPoint - wallPoints.FirstFrontGroundPoint) / 2 + wallPoints.FirstFrontGroundPoint;
+        }
+
         public void AddCornerPoint(WallPoints wallPoints)
         {
-            Vector3 position = (wallPoints.FirstBackGroundPoint - wallPoints.FirstFrontGroundPoint) / 2 + wallPoints.FirstFrontGroundPoint;
+            Vector3 position = CalculateCornerPosition(wallPoints);
             Vector3 lookVector = wallPoints.FirstFrontGroundPoint - wallPoints.FirstBackGroundPoint;
 
             tempCornerPiece = new GameObject("CornerPiece").AddComponent<CornerPiece>();

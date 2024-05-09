@@ -60,7 +60,6 @@ namespace WallSystem.Runtime
             _firstDepthVector = firstDepthVector;
             _secondDepthVector = secondDepthVector;
 
-            RecalculateNormalVectors();
             RecalculateWallPoints();
         }
 
@@ -96,6 +95,7 @@ namespace WallSystem.Runtime
 
         public void RecalculateWallPoints()
         {
+            RecalculateNormalVectors();
             WallPoints = new()
             {
                 FirstFrontGroundPoint = _firstGroundPoint,
@@ -109,27 +109,27 @@ namespace WallSystem.Runtime
             };
             OnVerticiesUpdated?.Invoke();
         }
-        
+
         public void RecalculateNormalVectors()
         {
-            float angle = Vector3.Angle(_firstDepthVector.normalized, -GetForwardVector());
-            float cosine = (float)Math.Round(Mathf.Cos(angle * Mathf.Deg2Rad), 2);
+            float angle = (float)Vector3.Angle(_firstDepthVector.normalized, -GetForwardVector());
+            float cosine = Mathf.Cos(angle * Mathf.Deg2Rad);
             float newLength = _wallSegmentWidth / cosine;
 
             if (cosine > 0)
             {
-                _firstDepthVector = _firstDepthVector.normalized * (float)Math.Round(newLength, 2);
+                _firstDepthVector = _firstDepthVector.normalized * newLength;
             }
 
-            angle = Vector3.Angle(_secondDepthVector.normalized, -GetForwardVector());
-            cosine = (float)Math.Round(Mathf.Cos(angle * Mathf.Deg2Rad), 2);
+            angle = (float)Vector3.Angle(-GetForwardVector(), _secondDepthVector.normalized);
+            cosine = Mathf.Cos(angle * Mathf.Deg2Rad);
             newLength = _wallSegmentWidth / cosine;
             if (cosine > 0)
             {
-                _secondDepthVector = _secondDepthVector.normalized * (float)Math.Round(newLength, 2);
+                _secondDepthVector = _secondDepthVector.normalized * newLength;
             }
-            OnVerticiesUpdated?.Invoke();
         }
+
 
         public Vector3 GetForwardVector()
         {
@@ -174,13 +174,13 @@ namespace WallSystem.Runtime
         internal void SetFirstFrontGroundPoint(Vector3 firstGroundPoint)
         {
             _firstGroundPoint = firstGroundPoint;
-            RecalculateNormalVectors();
+            RecalculateWallPoints();
         }
 
         internal void SetSecondFrontGroundPoint(Vector3 secondGroundPoint)
         {
             _secondGroundPoint = secondGroundPoint;
-            RecalculateNormalVectors();
+            RecalculateWallPoints();
         }
     }
 }
