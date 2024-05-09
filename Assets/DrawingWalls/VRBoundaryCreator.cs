@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using WallSystem.Interfaces;
+using WallSystem.Runtime.Interfaces;
 using UnityEngine.InputSystem;
 using DrawingSystem;
 using DrawingSystem.Interface;
-using WallSystem;
+using WallSystem.Runtime;
 
 namespace DrawingWalls
 {

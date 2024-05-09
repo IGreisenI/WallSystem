@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DrawingSystem;
-using WallSystem;
+using WallSystem.Runtime;
 using NaughtyAttributes;
 
 namespace DrawingWalls 
