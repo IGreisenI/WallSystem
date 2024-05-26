@@ -6,11 +6,9 @@ This is a wall system for making walls based on a vr boundary. All that is neede
 In the project there is also a drawing system to allow the user to draw walls in the scene. Scenes for mouse and vr drawing can be found under Assets->DrawingWalls->Sample.
 Once a line is drawn, the system converts it into a wall using a list of Vector3 points, generating rectangular geometry between points with proper UV mappings.
 
-In this project for models I am using a free https://assetstore.unity.com/packages/3d/environments/historic/polylised-medieval-desert-city-94557 asset.
-
-I am using Naughty Attributes for the buttons in the inspectors https://github.com/dbrizov/NaughtyAttributes.
-
-And for Debugging in VR I am using DebugXR, by Tobiesen https://assetstore.unity.com/packages/tools/gui/in-game-debug-log-for-ar-and-vr-devices-174780.
+In this project for models I am using a free https://assetstore.unity.com/packages/3d/environments/historic/polylised-medieval-desert-city-94557 asset.\
+I am using Naughty Attributes for the buttons in the inspectors https://github.com/dbrizov/NaughtyAttributes \
+For Debugging in VR I am using DebugXR, by Tobiesen https://assetstore.unity.com/packages/tools/gui/in-game-debug-log-for-ar-and-vr-devices-174780 \ 
 
 ## Features
 
