@@ -6,6 +6,10 @@ This is a wall system for making walls based on a vr boundary. All that is neede
 In the project there is also a drawing system to allow the user to draw walls in the scene. Scenes for mouse and vr drawing can be found under Assets->DrawingWalls->Sample.
 Once a line is drawn, the system converts it into a wall using a list of Vector3 points, generating rectangular geometry between points with proper UV mappings.
 
+In this project for models I am using a free https://assetstore.unity.com/packages/3d/environments/historic/polylised-medieval-desert-city-94557 asset.
+I am using Naughty Attributes for the buttons in the inspectors https://github.com/dbrizov/NaughtyAttributes.
+And for Debugging in VR I am using DebugXR, by Tobiesen https://assetstore.unity.com/packages/tools/gui/in-game-debug-log-for-ar-and-vr-devices-174780.
+
 ## Features
 
 - **Wall Generation**: Create walls using a list of Vector3 points.
@@ -36,6 +40,9 @@ Once a line is drawn, the system converts it into a wall using a list of Vector3
 3. **Start Drawing**: Click and hold the mouse button to start drawing a line.
 4. **Generate Wall**: The system will automatically generate a wall based on the drawn line's points.
 
+![Unity_cKrpunmu1n](https://github.com/IGreisenI/WallSystem/assets/58489283/0977633b-f264-44ad-8408-15a4c88af996)
+![Unity_VNOIo0CrLW](https://github.com/IGreisenI/WallSystem/assets/58489283/f3724755-86d6-42c2-a6a2-e3999d5cb51f)
+
 ### Wall Creator Component
 Buttons in the inspector:
     - Create Random Wall From Points
@@ -45,3 +52,9 @@ Buttons in the inspector:
       - Creates the same thing but with meshes
     - Add Geo
       - Adds geometry along the walls. Settings for this are under "Dynamic Geometry Settings" in the inspector.   
+![Unity_DOybRehuuP](https://github.com/IGreisenI/WallSystem/assets/58489283/4607e0d6-053a-4dac-af2d-b07566db0014)
+
+### Editing the corner pieces
+The corner pieces have a clickable dot in their origins. Once they are clicked an editor window pops up with models within the project. Selecting one and pressing "Place Object" will replace the corner piece with the selected model.
+![Unity_BDq0fPyh66](https://github.com/IGreisenI/WallSystem/assets/58489283/06bcd779-01f0-4769-b08b-a132939b7770)
+
