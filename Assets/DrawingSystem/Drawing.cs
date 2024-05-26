@@ -147,7 +147,7 @@ namespace DrawingSystem
         {
             RaycastHit hit;
             Ray ray = drawingRaycaster.DrawingRaycast();
-            Physics.Raycast(ray, out hit, 100);
+            Physics.Raycast(ray, out hit, 10000);
             return hit;
         }
 
